@@ -42,7 +42,7 @@
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
         #container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
-        button { font-family: 'Roboto', sans-serif; }
+        button, input { font-family: 'Roboto', sans-serif; }
         
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
         .loader { width: 60px; height: 60px; animation: rotate 1s linear infinite; transform-origin: center center; }
@@ -61,6 +61,7 @@
         #startup-dropzone p { margin: 0; font-size: 1.1rem; }
         #startup-selectFileBtn { font-size: 1rem; padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--button-bg); color: var(--text-color); cursor: pointer; transition: background-color 0.2s; }
         #startup-selectFileBtn:hover { background-color: var(--button-hover-bg); }
+        #supported-formats { margin-top: 12px; font-size: 0.85rem; color: var(--text-color); opacity: 0.7; }
 
         #help-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 101; justify-content: center; align-items: center; }
         .help-content { background-color: var(--ui-bg-color); width: 90%; max-width: 800px; max-height: 80vh; border-radius: 12px; padding: 25px; overflow-y: auto; position: relative; }
@@ -71,7 +72,8 @@
         #close-help-btn svg { width: 24px; height: 24px; }
         
         #main-ui-container { display: none; }
-        #header { position: fixed; top: 0; left: 0; width: 100%; z-index: 20; display: flex; justify-content: space-between; align-items: center; padding: 15px; pointer-events: none; }
+        #header { position: fixed; top: 0; width: 100%; z-index: 20; display: flex; justify-content: space-between; align-items: flex-start; padding: 15px; pointer-events: none; }
+        .header-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
         #site-title { font-size: 1.5rem; font-weight: 500; cursor: pointer; pointer-events: auto; }
         #stats-js { position: static; pointer-events: auto; }
         
@@ -114,6 +116,20 @@
         input:checked + .slider-switch:before { transform: translateX(20px); }
         button { padding: 6px 10px; border: 1px solid var(--border-color); background-color: var(--button-bg); color: var(--text-color); border-radius: 6px; cursor: pointer; transition: background-color 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         button:hover { background-color: var(--button-hover-bg); }
+        
+        .teleport-controls { display: flex; gap: 5px; align-items: center; }
+        .teleport-controls input[type="number"] {
+            width: 100%;
+            padding: 4px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            -moz-appearance: textfield;
+            font-family: 'Roboto', sans-serif;
+        }
+        .teleport-controls input[type="number"]::-webkit-outer-spin-button,
+        .teleport-controls input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body>
@@ -129,6 +145,7 @@
         <div id="startup-dropzone">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/><path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/></svg>
             <p>ここにファイルをドラッグ＆ドロップ</p><button id="startup-selectFileBtn">またはファイルを選択</button>
+            <p id="supported-formats">対応形式: .glb, .gltf, .obj, .fbx, .stl, .zip</p>
         </div>
         <input type="file" id="file-input" style="display: none;">
     </div>
@@ -161,7 +178,7 @@
                     <ul>
                         <li><b>表示設定:</b> エッジ、座標軸、地面グリッド、パフォーマンス統計(FPS)の表示/非表示を切り替えられます。</li>
                         <li><b>モデル操作:</b> スライダーでモデルのサイズを変更したり、リセットボタンで初期サイズに戻せます。</li>
-                        <li><b>カメラ操作:</b> 「ズームをリセット」ボタンで、モデル全体が見える初期のカメラ位置に戻します。</li>
+                        <li><b>カメラ操作:</b> 「ズームをリセット」ボタンで、モデル全体が見える初期のカメラ位置に戻します。テレポート機能で指定座標へ移動も可能です。</li>
                     </ul>
                 </li>
             </ul>
@@ -175,7 +192,12 @@
     </div>
 
     <div id="main-ui-container">
-        <div id="header"><h1 id="site-title">3D Viewer</h1><div id="stats-js"></div></div>
+        <div id="header">
+            <div class="header-left">
+                <h1 id="site-title">3D Viewer</h1>
+                <div id="stats-js"></div>
+            </div>
+        </div>
         <div id="left-panel-container" class="panel-container">
             <div id="left-tab-header" class="tab-header-vertical">
                 <button class="tab-btn" data-panel="left" data-tab="files-tab" title="ファイル"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z"/></svg></button>
@@ -194,7 +216,7 @@
             <div id="right-panel-content" class="panel-content-wrapper">
                 <div id="details-tab" class="tab-content"><div id="stats-output" class="content-section"><p>モデルを読み込んでください</p></div></div>
                 <div id="display-tab" class="tab-content">
-                    <div class="content-section"><h3>表示設定</h3><div class="control-group"><label for="showEdges">エッジ表示</label><label class="switch"><input type="checkbox" id="showEdges"><span class="slider-switch"></span></label></div><div class="control-group"><label for="showAxes">座標軸表示</label><label class="switch"><input type="checkbox" id="showAxes" checked><span class="slider-switch"></span></label></div><div class="control-group"><label for="showGrid">地面グリッド表示</label><label class="switch"><input type="checkbox" id="showGrid" checked><span class="slider-switch"></span></label></div><div class="control-group"><label for="showStats">パフォーマンス表示</label><label class="switch"><input type="checkbox" id="showStats" checked><span class="slider-switch"></span></label></div></div><hr/><div class="content-section"><h3>モデル操作</h3><div class="control-group"><label for="modelScale">モデルサイズ</label><input type="range" id="modelScale" min="0.1" max="5" step="0.05" value="1"><button id="resetScale" title="サイズをリセット"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41M-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/></svg></button></div></div><hr/><div class="content-section"><h3>カメラ操作</h3><button id="reset-zoom-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/></svg>ズームをリセット</button></div>
+                    <div class="content-section"><h3>表示設定</h3><div class="control-group"><label for="showEdges">エッジ表示</label><label class="switch"><input type="checkbox" id="showEdges"><span class="slider-switch"></span></label></div><div class="control-group"><label for="showAxes">座標軸表示</label><label class="switch"><input type="checkbox" id="showAxes" checked><span class="slider-switch"></span></label></div><div class="control-group"><label for="showGrid">地面グリッド表示</label><label class="switch"><input type="checkbox" id="showGrid" checked><span class="slider-switch"></span></label></div><div class="control-group"><label for="showStats">パフォーマンス表示</label><label class="switch"><input type="checkbox" id="showStats" checked><span class="slider-switch"></span></label></div></div><hr/><div class="content-section"><h3>モデル操作</h3><div class="control-group"><label for="modelScale">モデルサイズ</label><input type="range" id="modelScale" min="0.1" max="5" step="0.05" value="1"><button id="resetScale" title="サイズをリセット"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41M-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/></svg></button></div></div><hr/><div class="content-section"><h3>カメラ操作</h3><button id="reset-zoom-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/></svg>ズームをリセット</button><div class="teleport-controls"><input type="number" id="teleportX" placeholder="X"><input type="number" id="teleportY" placeholder="Y"><input type="number" id="teleportZ" placeholder="Z"><button id="teleportBtn">移動</button></div></div>
                 </div>
             </div>
         </div>
@@ -218,8 +240,8 @@
         const highlightMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x55ff55, roughness: 0.4, metalness: 0.1 });
         const visibleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>`;
         const hiddenIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/><path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/></svg>`;
-        const elements = { container: document.getElementById('container'), loadingOverlay: document.getElementById('loading-overlay'), startupScreen: document.getElementById('startup-screen'), mainUiContainer: document.getElementById('main-ui-container'), siteTitle: document.getElementById('site-title'), statsJsPanel: document.getElementById('stats-js'), helpBtn: document.getElementById('help-btn'), helpModal: document.getElementById('help-modal'), closeHelpBtn: document.getElementById('close-help-btn'), leftPanelContent: document.getElementById('left-panel-content'), rightPanelContent: document.getElementById('right-panel-content'), fileInput: document.getElementById('file-input'), startupDropzone: document.getElementById('startup-dropzone'), statsOutput: document.getElementById('stats-output'), showEdges: document.getElementById('showEdges'), showAxes: document.getElementById('showAxes'), showGrid: document.getElementById('showGrid'), showStats: document.getElementById('showStats'), modelScale: document.getElementById('modelScale'), resetScale: document.getElementById('resetScale'), resetZoomBtn: document.getElementById('reset-zoom-btn'), filesTab: document.getElementById('files-tab'), materialsTab: document.getElementById('materials-tab'), meshesTab: document.getElementById('meshes-tab') };
-        const START_CAMERA_POS = new THREE.Vector3(10, 10, 10);
+        const elements = { container: document.getElementById('container'), loadingOverlay: document.getElementById('loading-overlay'), startupScreen: document.getElementById('startup-screen'), mainUiContainer: document.getElementById('main-ui-container'), siteTitle: document.getElementById('site-title'), statsJsPanel: document.getElementById('stats-js'), helpBtn: document.getElementById('help-btn'), helpModal: document.getElementById('help-modal'), closeHelpBtn: document.getElementById('close-help-btn'), leftPanelContent: document.getElementById('left-panel-content'), rightPanelContent: document.getElementById('right-panel-content'), fileInput: document.getElementById('file-input'), startupDropzone: document.getElementById('startup-dropzone'), statsOutput: document.getElementById('stats-output'), showEdges: document.getElementById('showEdges'), showAxes: document.getElementById('showAxes'), showGrid: document.getElementById('showGrid'), showStats: document.getElementById('showStats'), modelScale: document.getElementById('modelScale'), resetScale: document.getElementById('resetScale'), resetZoomBtn: document.getElementById('reset-zoom-btn'), filesTab: document.getElementById('files-tab'), materialsTab: document.getElementById('materials-tab'), meshesTab: document.getElementById('meshes-tab'), teleportX: document.getElementById('teleportX'), teleportY: document.getElementById('teleportY'), teleportZ: document.getElementById('teleportZ'), teleportBtn: document.getElementById('teleportBtn') };
+        const START_CAMERA_POS = new THREE.Vector3(20, 20, 20);
 
         init();
         animate();
@@ -240,12 +262,12 @@
             controls.enableDamping = true;
             stats = new Stats();
             elements.statsJsPanel.appendChild(stats.dom);
-            gridHelper = new THREE.GridHelper(10000, 100, 0x888888, 0x444444);
+            gridHelper = new THREE.GridHelper(10000, 10000, 0x888888, 0x444444);
             scene.add(gridHelper);
             axesHelper = new THREE.AxesHelper(5000);
             scene.add(axesHelper);
             addEventListeners();
-            switchUiMode(true); // 初期状態はスタート画面
+            switchUiMode(true);
         }
         
         function addEventListeners() {
@@ -267,6 +289,7 @@
             elements.modelScale.addEventListener('input', handleScaleChange);
             elements.resetScale.addEventListener('click', resetScale);
             elements.resetZoomBtn.addEventListener('click', resetCamera);
+            elements.teleportBtn.addEventListener('click', handleTeleport);
         }
 
         function onWindowResize() {
@@ -275,7 +298,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        function animate() { requestAnimationFrame(animate); controls.update(); stats.update(); renderer.render(scene, camera); }
+        function animate() { requestAnimationFrame(animate); controls.update(); stats.update(); renderer.render(scene, camera); if(document.getElementById('camera-coords')) document.getElementById('camera-coords').textContent = `X:${camera.position.x.toFixed(1)} Y:${camera.position.y.toFixed(1)} Z:${camera.position.z.toFixed(1)}`;}
         
         async function loadFile(file) {
             if (!file) return;
@@ -366,6 +389,7 @@
                 cleanScene();
                 camera.position.copy(START_CAMERA_POS);
                 controls.target.set(0, 0, 0);
+                controls.update();
             }
         }
         function showLoading(show) { elements.loadingOverlay.style.display = show ? 'flex' : 'none'; }
@@ -408,9 +432,7 @@
                 </div>`).join('') || '<p>メッシュ情報なし</p>';
             elements.meshesTab.querySelectorAll('.list-item').forEach(item => {
                 item.addEventListener('click', (e) => handleMeshSelect(e.currentTarget.dataset.uuid));
-                item.querySelector('.visibility-toggle').addEventListener('click', (e) => {
-                    e.stopPropagation(); handleMeshVisibility(e.currentTarget.dataset.uuid);
-                });
+                item.querySelector('.visibility-toggle').addEventListener('click', (e) => { e.stopPropagation(); handleMeshVisibility(e.currentTarget.dataset.uuid); });
             });
             updateStats();
         }
@@ -447,25 +469,38 @@
         function updateStats(targetObject) {
             const obj = targetObject || modelWrapper;
             if (!obj) { elements.statsOutput.innerHTML = '<h3>モデル情報</h3><div class="content-section"><p>モデルを読み込んでください</p></div>'; return; }
-            const stats = { vertices: 0, triangles: 0, objects: 0 };
+            const stats = { vertices: 0, triangles: 0, objects: 0, geometries: new Set(), materials: new Set(), textures: new Set(), lights: 0, cameras: 0 };
             obj.traverse(child => {
                 if (child.isMesh) {
                     stats.objects++;
                     if (child.geometry) {
+                        stats.geometries.add(child.geometry.uuid);
                         stats.vertices += child.geometry.attributes.position.count;
                         stats.triangles += (child.geometry.index) ? child.geometry.index.count / 3 : child.geometry.attributes.position.count / 3;
                     }
-                }
+                    const mat = Array.isArray(child.material) ? child.material : [child.material];
+                    mat.forEach(m => { if(m) { stats.materials.add(m.uuid); for (const key in m) if (m[key] instanceof THREE.Texture) stats.textures.add(m[key].uuid); } });
+                } else if(child.isLight) { stats.lights++; }
+                else if(child.isCamera) { stats.cameras++; }
             });
             const size = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
             const header = targetObject ? `<h3>${targetObject.name || '選択オブジェクト'}</h3>` : '<h3>モデル全体</h3>';
+            const animationsCount = fullGltfData?.animations?.length || 0;
             elements.statsOutput.innerHTML = `${header}<div class="content-section">
-                ${!targetObject ? `<p><strong>ファイル名:</strong> ${fileInfo.name}</p>` : ''}
+                ${!targetObject ? `<p><strong>ファイル名:</strong> ${fileInfo.name}</p><p><strong>ファイルサイズ:</strong> ${(fileInfo.size / 1024 / 1024).toFixed(2)} MB</p>` : ''}
                 <p><strong>寸法 (W/H/D):</strong> ${size.x.toFixed(2)} / ${size.y.toFixed(2)} / ${size.z.toFixed(2)}</p>
                 </div><hr/><div class="content-section">
                 <p><strong>頂点数:</strong> ${stats.vertices.toLocaleString()}</p>
                 <p><strong>三角形数:</strong> ${Math.floor(stats.triangles).toLocaleString()}</p>
-                <p><strong>オブジェクト数:</strong> ${stats.objects.toLocaleString()}</p></div>
+                <p><strong>オブジェクト数:</strong> ${stats.objects.toLocaleString()}</p>
+                <p><strong>ジオメトリ数:</strong> ${stats.geometries.size}</p>
+                <p><strong>マテリアル数:</strong> ${stats.materials.size}</p>
+                <p><strong>テクスチャ数:</strong> ${stats.textures.size}</p>
+                </div><hr/><div class="content-section">
+                <p><strong>アニメーション数:</strong> ${animationsCount}</p>
+                <p><strong>ライト数:</strong> ${stats.lights}</p>
+                <p><strong>カメラ数:</strong> ${stats.cameras}</p>
+                <p><strong>カメラ座標:</strong> <span id="camera-coords"></span></p></div>
             `;
         }
         
@@ -486,8 +521,14 @@
             elements.modelScale.value = 1;
         }
         function resetCamera() { if(!modelWrapper) return; camera.position.copy(initialCameraPosition); controls.target.copy(initialControlsTarget); controls.update(); }
+        function handleTeleport() {
+            const x = parseFloat(elements.teleportX.value);
+            const y = parseFloat(elements.teleportY.value);
+            const z = parseFloat(elements.teleportZ.value);
+            if (!isNaN(x) && !isNaN(y) && !isNaN(z)) { camera.position.set(x, y, z); controls.update(); } 
+            else { alert('有効な数値をすべての座標に入力してください。'); }
+        }
         function toggleEdges() { if (!modelWrapper) return; elements.showEdges.checked ? createEdges(modelWrapper.children[0]) : removeEdges(modelWrapper.children[0]); }
-
         function createEdges(object) {
             object.traverse((child) => {
                 if (child.isMesh && !child.children.some(c => c.userData.isEdge)) {
