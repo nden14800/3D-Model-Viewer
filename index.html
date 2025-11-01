@@ -104,35 +104,63 @@
         }
         
         /* スクロールバーのデザイン */
-        #ui::-webkit-scrollbar {
-            width: 8px;
-        }
-        #ui::-webkit-scrollbar-track {
-            background: var(--scrollbar-track);
-            border-radius: 4px;
-        }
-        #ui::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb);
-            border-radius: 4px;
-        }
-        #ui::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
-        }
+        #ui::-webkit-scrollbar { width: 8px; }
+        #ui::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 4px; }
+        #ui::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+        #ui::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
+        #hideUiBtn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            color: var(--text-color);
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        #hideUiBtn:hover { opacity: 1; }
+        #hideUiBtn svg { width: 16px; height: 16px; }
+
+        #showUiBtn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 11;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--ui-bg-color);
+            backdrop-filter: blur(5px);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            display: none; /* 初期状態は非表示 */
+        }
+        
         #dropzone {
             border: 2px dashed var(--border-color);
             border-radius: 5px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
-        #dropzone.dragover {
-            background-color: rgba(3, 169, 244, 0.2);
+        #dropzone svg {
+            width: 32px;
+            height: 32px;
+            opacity: 0.7;
         }
-        #fileInput {
-            display: none;
-        }
+        #dropzone p { margin: 0; }
+        #dropzone.dragover { background-color: rgba(3, 169, 244, 0.2); }
+        #fileInput { display: none; }
         
         .control-group {
             display: flex;
@@ -140,66 +168,32 @@
             justify-content: space-between;
             gap: 10px;
         }
-        .control-group label {
-            white-space: nowrap;
-        }
+        .control-group label { white-space: nowrap; }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: var(--accent-color);
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
         
-        input[type="range"] {
-            flex-grow: 1;
-        }
+        input[type="range"] { flex-grow: 1; }
         
         button {
-            padding: 4px 8px;
+            padding: 6px 10px;
             border: 1px solid var(--border-color);
             background-color: var(--button-bg);
             color: var(--text-color);
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
-        button:hover {
-            background-color: var(--button-hover-bg);
-        }
+        button:hover { background-color: var(--button-hover-bg); }
+        button svg { width: 16px; height: 16px; }
         
         #deleteModelBtn {
             width: 100%;
@@ -208,99 +202,81 @@
             color: white;
             border: none;
             font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
         }
-        #deleteModelBtn:hover {
-             background-color: var(--delete-button-hover-bg);
-        }
+        #deleteModelBtn:hover { background-color: var(--delete-button-hover-bg); }
         
-        #teleport-section {
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-        }
-        #teleport-section h3 {
-            margin: 0 0 8px 0;
-            font-size: 1em;
-        }
-        .teleport-controls {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
+        #teleport-section { padding-top: 10px; border-top: 1px solid var(--border-color); }
+        #teleport-section h3 { margin: 0 0 8px 0; font-size: 1em; }
+        .teleport-controls { display: flex; gap: 5px; align-items: center; }
         .teleport-controls input[type="number"] {
-            width: 55px;
-            padding: 4px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            -moz-appearance: textfield;
+            width: 55px; padding: 4px; background-color: var(--bg-color); color: var(--text-color);
+            border: 1px solid var(--border-color); border-radius: 4px; -moz-appearance: textfield;
         }
         .teleport-controls input[type="number"]::-webkit-outer-spin-button,
-        .teleport-controls input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .teleport-controls button {
-            flex-grow: 1;
-        }
+        .teleport-controls input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .teleport-controls button { flex-grow: 1; }
 
-
-        #info-panel {
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-        }
-        #info-panel h3 {
-            margin: 0 0 8px 0;
-            font-size: 1em;
-        }
-        #info-panel p {
-            margin: 2px 0;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
+        #info-panel { padding-top: 10px; border-top: 1px solid var(--border-color); }
+        #info-panel h3 { margin: 0 0 8px 0; font-size: 1em; }
+        #info-panel p { margin: 2px 0; font-size: 0.9em; line-height: 1.5; }
         
-        #stats-js {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-        }
+        #stats-js { position: absolute; top: 15px; right: 15px; }
     </style>
 </head>
 <body>
     <div id="container"></div>
 
+    <button id="showUiBtn">UIを表示</button>
+
     <div id="ui">
+        <button id="hideUiBtn" title="UIを非表示">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+            </svg>
+        </button>
         <div id="dropzone">
-            <p>ここにファイルをドラッグ＆ドロップ<br>またはクリックして選択</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/>
+                <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/>
+            </svg>
+            <p>ここにファイルをドラッグ＆ドロップ</p>
+            <button id="selectFileBtn">またはファイルを選択</button>
             <input type="file" id="fileInput">
         </div>
         
         <div class="control-group">
             <label for="showEdges">エッジ表示</label>
-            <label class="switch">
-                <input type="checkbox" id="showEdges">
-                <span class="slider"></span>
-            </label>
+            <label class="switch"><input type="checkbox" id="showEdges"><span class="slider"></span></label>
         </div>
         
         <div class="control-group">
             <label for="showAxes">座標軸表示</label>
-            <label class="switch">
-                <input type="checkbox" id="showAxes" checked>
-                <span class="slider"></span>
-            </label>
+            <label class="switch"><input type="checkbox" id="showAxes" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="control-group">
+            <label for="showGrid">地面グリッド表示</label>
+            <label class="switch"><input type="checkbox" id="showGrid" checked><span class="slider"></span></label>
         </div>
 
         <div class="control-group">
             <label for="modelScale">モデルサイズ</label>
             <input type="range" id="modelScale" min="0.1" max="5" step="0.05" value="1">
-            <button id="resetScale">リセット</button>
+            <button id="resetScale" title="サイズをリセット">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
+                    <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
+                </svg>
+            </button>
         </div>
 
-        <button id="deleteModelBtn" style="display: none;">モデルを削除</button>
+        <button id="deleteModelBtn" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+            </svg>
+            モデルを削除
+        </button>
         
         <div id="teleport-section">
             <h3>テレポート</h3>
@@ -345,18 +321,24 @@
         import { STLLoader } from 'three/addons/loaders/STLLoader.js';
         import Stats from 'three/addons/libs/stats.module.js';
 
-        let scene, camera, renderer, controls, stats, axesHelper;
-        let modelWrapper; // モデルをラップするコンテナ
+        let scene, camera, renderer, controls, stats, axesHelper, gridHelper;
+        let modelWrapper;
         let fileInfo = { name: '', size: 0 };
         let fullGltfData;
         let initialModelSize = 0;
         let initialCameraDistance = 0;
 
         const container = document.getElementById('container');
+        const uiPanel = document.getElementById('ui');
+        const hideUiBtn = document.getElementById('hideUiBtn');
+        const showUiBtn = document.getElementById('showUiBtn');
+        const statsJsPanel = document.getElementById('stats-js');
         const fileInput = document.getElementById('fileInput');
         const dropzone = document.getElementById('dropzone');
+        const selectFileBtn = document.getElementById('selectFileBtn');
         const showEdgesCheckbox = document.getElementById('showEdges');
         const showAxesCheckbox = document.getElementById('showAxes');
+        const showGridCheckbox = document.getElementById('showGrid');
         const statsOutput = document.getElementById('stats-output');
         const coordsOutput = document.getElementById('coords-output');
         const scaleSlider = document.getElementById('modelScale');
@@ -401,10 +383,10 @@
 
             // Stats.js
             stats = new Stats();
-            document.getElementById('stats-js').appendChild(stats.dom);
+            statsJsPanel.appendChild(stats.dom);
 
             // Helpers
-            const gridHelper = new THREE.GridHelper(10000, 10000);
+            gridHelper = new THREE.GridHelper(10000, 10000);
             scene.add(gridHelper);
             axesHelper = new THREE.AxesHelper(1000);
             scene.add(axesHelper);
@@ -412,16 +394,19 @@
             // Event Listeners
             window.addEventListener('resize', onWindowResize);
             fileInput.addEventListener('change', handleFileSelect);
-            dropzone.addEventListener('click', () => fileInput.click());
             dropzone.addEventListener('dragover', handleDragOver);
             dropzone.addEventListener('dragleave', handleDragLeave);
             dropzone.addEventListener('drop', handleFileDrop);
+            selectFileBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
             showEdgesCheckbox.addEventListener('change', toggleEdges);
             showAxesCheckbox.addEventListener('change', toggleAxesHelper);
+            showGridCheckbox.addEventListener('change', toggleGridHelper);
             scaleSlider.addEventListener('input', handleScaleChange);
             resetScaleBtn.addEventListener('click', resetScale);
             deleteModelBtn.addEventListener('click', cleanScene);
             teleportBtn.addEventListener('click', handleTeleport);
+            hideUiBtn.addEventListener('click', () => toggleUi(false));
+            showUiBtn.addEventListener('click', () => toggleUi(true));
 
             // Theme change listener
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
@@ -441,84 +426,49 @@
             requestAnimationFrame(animate);
             controls.update();
             stats.update();
-            
-            // Update camera coordinates
             const camPos = camera.position;
             coordsOutput.textContent = `カメラ座標: X:${camPos.x.toFixed(2)} Y:${camPos.y.toFixed(2)} Z:${camPos.z.toFixed(2)}`;
-
             renderer.render(scene, camera);
         }
 
         // --- File Handling ---
-        function handleFileSelect(event) {
-            loadFile(event.target.files[0]);
-        }
-        
-        function handleDragOver(event) {
-            event.preventDefault();
-            dropzone.classList.add('dragover');
-        }
-
-        function handleDragLeave(event) {
-            event.preventDefault();
-            dropzone.classList.remove('dragover');
-        }
-
+        function handleFileSelect(event) { loadFile(event.target.files[0]); }
+        function handleDragOver(event) { event.preventDefault(); dropzone.classList.add('dragover'); }
+        function handleDragLeave(event) { event.preventDefault(); dropzone.classList.remove('dragover'); }
         function handleFileDrop(event) {
             event.preventDefault();
             dropzone.classList.remove('dragover');
-            if (event.dataTransfer.files.length > 0) {
-                loadFile(event.dataTransfer.files[0]);
-            }
+            if (event.dataTransfer.files.length > 0) { loadFile(event.dataTransfer.files[0]); }
         }
         
         async function loadFile(file) {
             if (!file) return;
-
             cleanScene();
             fileInfo = { name: file.name, size: file.size };
             statsOutput.innerHTML = '<p>読み込み中...</p>';
-
-            const fileName = file.name;
-            const extension = fileName.split('.').pop().toLowerCase();
-            
-            if (extension === 'zip') {
-                await handleZipFile(file);
-            } else {
-                const url = URL.createObjectURL(file);
-                loadModel(url, extension);
-            }
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (extension === 'zip') { await handleZipFile(file); } 
+            else { const url = URL.createObjectURL(file); loadModel(url, extension); }
         }
 
         async function handleZipFile(file) {
             const jszip = new JSZip();
             const zip = await jszip.loadAsync(file);
-            
             const objectURLs = {};
             const filesToLoad = [];
-
             for (const filename in zip.files) {
-                if (!zip.files[filename].dir) {
-                    filesToLoad.push({ filename, promise: zip.files[filename].async('blob') });
-                }
+                if (!zip.files[filename].dir) { filesToLoad.push({ filename, promise: zip.files[filename].async('blob') }); }
             }
-
             const blobs = await Promise.all(filesToLoad.map(f => f.promise));
             filesToLoad.forEach((f, i) => { objectURLs[f.filename] = URL.createObjectURL(blobs[i]); });
-
             const manager = new THREE.LoadingManager();
             manager.setURLModifier((url) => {
                 const found = Object.keys(objectURLs).find(key => key.endsWith(url.split('/').pop()));
                 return objectURLs[found] || url;
             });
-            
             const modelFile = Object.keys(objectURLs).find(f => /\.(gltf|glb|obj|fbx|stl)$/i.test(f));
-            if (modelFile) {
-                const extension = modelFile.split('.').pop().toLowerCase();
-                loadModel(objectURLs[modelFile], extension, manager);
-            } else {
-                statsOutput.innerHTML = '<p>ZIP内に対応モデルが見つかりません。</p>';
-            }
+            if (modelFile) { loadModel(objectURLs[modelFile], modelFile.split('.').pop().toLowerCase(), manager); } 
+            else { statsOutput.innerHTML = '<p>ZIP内に対応モデルが見つかりません。</p>'; }
         }
 
         function loadModel(url, extension, manager = new THREE.LoadingManager()) {
@@ -528,32 +478,24 @@
                 case 'obj': loader = new OBJLoader(manager); break;
                 case 'fbx': loader = new FBXLoader(manager); break;
                 case 'stl': loader = new STLLoader(manager); break;
-                default:
-                    statsOutput.innerHTML = `<p>非対応の形式です: .${extension}</p>`;
-                    return;
+                default: statsOutput.innerHTML = `<p>非対応の形式です: .${extension}</p>`; return;
             }
-
             loader.load(url, (loadedObject) => {
                 let actualModel;
                 if (extension === 'gltf' || extension === 'glb') {
                     fullGltfData = loadedObject;
                     actualModel = loadedObject.scene;
                 } else if (extension === 'stl') {
-                    const material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0x111111, shininess: 200 });
-                    actualModel = new THREE.Mesh(loadedObject, material);
+                    actualModel = new THREE.Mesh(loadedObject, new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0x111111, shininess: 200 }));
                 } else {
                     actualModel = loadedObject;
                 }
-                
                 modelWrapper = new THREE.Group();
                 scene.add(modelWrapper);
                 fitAndCenterObject(actualModel, modelWrapper);
-
                 updateStats();
                 if (showEdgesCheckbox.checked) { createEdges(actualModel); }
-                
-                deleteModelBtn.style.display = 'block';
-
+                deleteModelBtn.style.display = 'inline-flex';
             }, 
             (xhr) => { if (xhr.lengthComputable) statsOutput.innerHTML = `<p>読み込み中: ${(xhr.loaded / xhr.total * 100).toFixed(0)}%</p>`; },
             (error) => { console.error(error); statsOutput.innerHTML = '<p>モデルの読み込みに失敗しました。</p>'; }
@@ -562,14 +504,13 @@
         
         function cleanScene() {
             deleteModelBtn.style.display = 'none';
-
             if (modelWrapper) {
                 scene.remove(modelWrapper);
                 modelWrapper.traverse(object => {
                     if (object.isMesh) {
                         if (object.geometry) object.geometry.dispose();
                         if (Array.isArray(object.material)) {
-                            object.material.forEach(material => { if (material.map) material.map.dispose(); material.dispose(); });
+                            object.material.forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
                         } else if (object.material) {
                             if (object.material.map) object.material.map.dispose();
                             object.material.dispose();
@@ -578,13 +519,10 @@
                 });
                 modelWrapper = null;
             }
-            
-            // OrbitControlsのカメラ距離制限と初期値をリセット
             controls.minDistance = 0;
             controls.maxDistance = Infinity;
             initialModelSize = 0;
             initialCameraDistance = 0;
-
             fullGltfData = null;
             showEdgesCheckbox.checked = false;
             resetScale();
@@ -598,45 +536,31 @@
             object.position.x -= center.x;
             object.position.y -= box.min.y;
             object.position.z -= center.z;
-
             const finalBox = new THREE.Box3().setFromObject(wrapper);
             const size = finalBox.getSize(new THREE.Vector3());
             const wrapperCenter = finalBox.getCenter(new THREE.Vector3());
-            
             const maxSize = Math.max(size.x, size.y, size.z);
             const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
             const fitWidthDistance = fitHeightDistance / camera.aspect;
             const distance = 1.5 * Math.max(fitHeightDistance, fitWidthDistance);
-            
-            // 初期値を保存
             initialModelSize = maxSize;
             initialCameraDistance = distance;
-
             controls.target.copy(wrapperCenter);
             camera.near = distance / 100;
             camera.far = distance * 100;
             camera.updateProjectionMatrix();
             camera.position.copy(wrapperCenter);
             camera.position.z += distance;
-
-            // 操作性の破綻を防ぐために、カメラの移動範囲を制限する
             controls.minDistance = initialModelSize * 0.1;
             controls.maxDistance = initialCameraDistance * 50;
-
             controls.update();
         }
 
         // --- UI Functions ---
         function updateStats() {
             if (!modelWrapper) return;
-            
-            const stats = {
-                vertices: 0, triangles: 0, objects: 0, lights: 0, cameras: 0,
-                geometries: new Set(), materials: new Set(), textures: new Set()
-            };
-            const actualModel = modelWrapper.children[0];
-
-            actualModel.traverse((child) => {
+            const stats = { vertices: 0, triangles: 0, objects: 0, lights: 0, cameras: 0, geometries: new Set(), materials: new Set(), textures: new Set() };
+            modelWrapper.children[0].traverse((child) => {
                 if (child.isMesh) {
                     stats.objects++;
                     if (child.geometry) {
@@ -644,19 +568,13 @@
                         stats.vertices += child.geometry.attributes.position.count;
                         stats.triangles += (child.geometry.index) ? child.geometry.index.count / 3 : child.geometry.attributes.position.count / 3;
                     }
-                    if (Array.isArray(child.material)) {
-                        child.material.forEach(m => collectMaterialInfo(m, stats));
-                    } else if (child.material) {
-                        collectMaterialInfo(child.material, stats);
-                    }
+                    if (Array.isArray(child.material)) { child.material.forEach(m => collectMaterialInfo(m, stats)); } 
+                    else if (child.material) { collectMaterialInfo(child.material, stats); }
                 } else if (child.isLight) { stats.lights++; } 
                   else if (child.isCamera) { stats.cameras++; }
             });
-
             const animationsCount = fullGltfData?.animations?.length || 0;
-            const box = new THREE.Box3().setFromObject(modelWrapper);
-            const size = box.getSize(new THREE.Vector3());
-
+            const size = new THREE.Box3().setFromObject(modelWrapper).getSize(new THREE.Vector3());
             statsOutput.innerHTML = `
                 <h3>モデル情報</h3>
                 <p><strong>ファイル名:</strong> ${fileInfo.name}</p>
@@ -677,38 +595,28 @@
         
         function collectMaterialInfo(material, stats) {
             stats.materials.add(material.uuid);
-            for (const key in material) {
-                if (material[key] instanceof THREE.Texture) {
-                    stats.textures.add(material[key].uuid);
-                }
-            }
+            for (const key in material) { if (material[key] instanceof THREE.Texture) { stats.textures.add(material[key].uuid); } }
         }
 
         function handleScaleChange(e) {
             if (modelWrapper) {
                 const scale = parseFloat(e.target.value);
                 modelWrapper.scale.set(scale, scale, scale);
-                
-                // スケールに合わせてカメラの距離制限を動的に更新
                 if (initialModelSize > 0 && initialCameraDistance > 0) {
                     controls.minDistance = initialModelSize * 0.1 * scale;
                     controls.maxDistance = initialCameraDistance * 50 * scale;
                 }
-
-                updateStats(); // スケール変更で寸法が変わるので情報を更新
+                updateStats();
             }
         }
         
         function resetScale() {
             if (modelWrapper) {
                 modelWrapper.scale.set(1, 1, 1);
-
-                // スケールリセット時にカメラ距離制限もリセット
                 if (initialModelSize > 0 && initialCameraDistance > 0) {
                     controls.minDistance = initialModelSize * 0.1;
                     controls.maxDistance = initialCameraDistance * 50;
                 }
-                
                 updateStats();
             }
             scaleSlider.value = 1;
@@ -717,34 +625,31 @@
         function toggleEdges() {
             if (!modelWrapper) return;
             const actualModel = modelWrapper.children[0];
-            if (showEdgesCheckbox.checked) {
-                createEdges(actualModel);
-            } else {
-                removeEdges(actualModel);
-            }
+            if (showEdgesCheckbox.checked) { createEdges(actualModel); } 
+            else { removeEdges(actualModel); }
         }
         
-        function toggleAxesHelper() {
-            axesHelper.visible = showAxesCheckbox.checked;
-        }
+        function toggleAxesHelper() { axesHelper.visible = showAxesCheckbox.checked; }
+        function toggleGridHelper() { gridHelper.visible = showGridCheckbox.checked; }
         
+        function toggleUi(show) {
+            uiPanel.style.display = show ? 'flex' : 'none';
+            statsJsPanel.style.display = show ? 'block' : 'none';
+            showUiBtn.style.display = show ? 'none' : 'block';
+        }
+
         function handleTeleport() {
             const x = parseFloat(teleportXInput.value);
             const y = parseFloat(teleportYInput.value);
             const z = parseFloat(teleportZInput.value);
-
-            if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
-                camera.position.set(x, y, z);
-                controls.update();
-            } else {
-                alert('有効な数値をすべての座標に入力してください。');
-            }
+            if (!isNaN(x) && !isNaN(y) && !isNaN(z)) { camera.position.set(x, y, z); controls.update(); } 
+            else { alert('有効な数値をすべての座標に入力してください。'); }
         }
 
         function createEdges(object) {
             object.traverse((child) => {
                 if (child.isMesh && !child.children.some(c => c.userData.isEdge)) {
-                    const edges = new THREE.EdgesGeometry(child.geometry, 1);
+                    const edges = new THREE.EdgesGeometry(child.geometry, 15);
                     const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x03a9f4, transparent: true, opacity: 0.8 }));
                     line.userData.isEdge = true;
                     child.add(line);
@@ -755,9 +660,7 @@
         function removeEdges(object) {
             const edgesToRemove = [];
             object.traverse(child => {
-                child.children.forEach(grandchild => {
-                    if (grandchild.userData.isEdge) edgesToRemove.push(grandchild);
-                });
+                child.children.forEach(grandchild => { if (grandchild.userData.isEdge) edgesToRemove.push(grandchild); });
             });
             edgesToRemove.forEach(edge => {
                 edge.parent.remove(edge);
