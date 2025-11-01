@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3Dモデルビューア</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS: スタイル設定 */
+        :root {
+            --bg-color-light: #f0f0f0;
+            --text-color-light: #212121;
+            --ui-bg-color-light: rgba(255, 255, 255, 0.85);
+            --border-color-light: #cccccc;
+            --button-bg-light: #e0e0e0;
+            --button-hover-bg-light: #d5d5d5;
+            --delete-button-bg-light: #d32f2f;
+            --delete-button-hover-bg-light: #c62828;
+            --scrollbar-thumb-light: #b0b0b0;
+            --scrollbar-track-light: #e0e0e0;
+
+            --bg-color-dark: #121212;
+            --text-color-dark: #e0e0e0;
+            --ui-bg-color-dark: rgba(40, 40, 40, 0.85);
+            --border-color-dark: #444444;
+            --button-bg-dark: #333333;
+            --button-hover-bg-dark: #454545;
+            --delete-button-bg-dark: #d32f2f;
+            --delete-button-hover-bg-dark: #c62828;
+            --scrollbar-thumb-dark: #555;
+            --scrollbar-track-dark: #333;
+
+            --accent-color: #03a9f4;
+        }
+
+        /* デフォルトはライトモード */
+        body {
+            --bg-color: var(--bg-color-light);
+            --text-color: var(--text-color-light);
+            --ui-bg-color: var(--ui-bg-color-light);
+            --border-color: var(--border-color-light);
+            --button-bg: var(--button-bg-light);
+            --button-hover-bg: var(--button-hover-bg-light);
+            --delete-button-bg: var(--delete-button-bg-light);
+            --delete-button-hover-bg: var(--delete-button-hover-bg-light);
+            --scrollbar-thumb: var(--scrollbar-thumb-light);
+            --scrollbar-track: var(--scrollbar-track-light);
+        }
+
+        /* ダークモード設定を検知 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                --bg-color: var(--bg-color-dark);
+                --text-color: var(--text-color-dark);
+                --ui-bg-color: var(--ui-bg-color-dark);
+                --border-color: var(--border-color-dark);
+                --button-bg: var(--button-bg-dark);
+                --button-hover-bg: var(--button-hover-bg-dark);
+                --delete-button-bg: var(--delete-button-bg-dark);
+                --delete-button-hover-bg: var(--delete-button-hover-bg-dark);
+                --scrollbar-thumb: var(--scrollbar-thumb-dark);
+                --scrollbar-track: var(--scrollbar-track-dark);
+            }
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #ui {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+            background-color: var(--ui-bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 320px;
+            font-size: 14px;
+            max-height: calc(100vh - 30px); /* UIの最大高さを設定 */
+            overflow-y: auto; /* 内容がはみ出た場合にスクロール */
+        }
+        
+        /* スクロールバーのデザイン */
+        #ui::-webkit-scrollbar {
+            width: 8px;
+        }
+        #ui::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 4px;
+        }
+        #ui::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+        #ui::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        #dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #dropzone.dragover {
+            background-color: rgba(3, 169, 244, 0.2);
+        }
+        #fileInput {
+            display: none;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .control-group label {
+            white-space: nowrap;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        input[type="range"] {
+            flex-grow: 1;
+        }
+        
+        button {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: var(--button-hover-bg);
+        }
+        
+        #deleteModelBtn {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--delete-button-bg);
+            color: white;
+            border: none;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #deleteModelBtn:hover {
+             background-color: var(--delete-button-hover-bg);
+        }
+        
+        #teleport-section {
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        #teleport-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 1em;
+        }
+        .teleport-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .teleport-controls input[type="number"] {
+            width: 55px;
+            padding: 4px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            -moz-appearance: textfield;
+        }
+        .teleport-controls input[type="number"]::-webkit-outer-spin-button,
+        .teleport-controls input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .teleport-controls button {
+            flex-grow: 1;
+        }
+
+
+        #info-panel {
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        #info-panel h3 {
+            margin: 0 0 8px 0;
+            font-size: 1em;
+        }
+        #info-panel p {
+            margin: 2px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        #stats-js {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <div id="ui">
+        <div id="dropzone">
+            <p>ここにファイルをドラッグ＆ドロップ<br>またはクリックして選択</p>
+            <input type="file" id="fileInput">
+        </div>
+        
+        <div class="control-group">
+            <label for="showEdges">エッジ表示</label>
+            <label class="switch">
+                <input type="checkbox" id="showEdges">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div class="control-group">
+            <label for="showAxes">座標軸表示</label>
+            <label class="switch">
+                <input type="checkbox" id="showAxes" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label for="modelScale">モデルサイズ</label>
+            <input type="range" id="modelScale" min="0.1" max="5" step="0.05" value="1">
+            <button id="resetScale">リセット</button>
+        </div>
+
+        <button id="deleteModelBtn" style="display: none;">モデルを削除</button>
+        
+        <div id="teleport-section">
+            <h3>テレポート</h3>
+            <div class="teleport-controls">
+                <input type="number" id="teleportX" placeholder="X">
+                <input type="number" id="teleportY" placeholder="Y">
+                <input type="number" id="teleportZ" placeholder="Z">
+                <button id="teleportBtn">移動</button>
+            </div>
+        </div>
+
+        <div id="info-panel">
+            <h3>情報</h3>
+            <p id="coords-output">カメラ座標: X:0 Y:0 Z:0</p>
+            <div id="stats-output">
+                <p id="info-text">モデルを読み込んでください</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="stats-js"></div>
+
+    <!-- ライブラリ -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- メインのJSコード -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+        import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+        import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+        import Stats from 'three/addons/libs/stats.module.js';
+
+        let scene, camera, renderer, controls, stats, axesHelper;
+        let modelWrapper; // モデルをラップするコンテナ
+        let fileInfo = { name: '', size: 0 };
+        let fullGltfData;
+        let initialModelSize = 0;
+        let initialCameraDistance = 0;
+
+        const container = document.getElementById('container');
+        const fileInput = document.getElementById('fileInput');
+        const dropzone = document.getElementById('dropzone');
+        const showEdgesCheckbox = document.getElementById('showEdges');
+        const showAxesCheckbox = document.getElementById('showAxes');
+        const statsOutput = document.getElementById('stats-output');
+        const coordsOutput = document.getElementById('coords-output');
+        const scaleSlider = document.getElementById('modelScale');
+        const resetScaleBtn = document.getElementById('resetScale');
+        const deleteModelBtn = document.getElementById('deleteModelBtn');
+        const teleportXInput = document.getElementById('teleportX');
+        const teleportYInput = document.getElementById('teleportY');
+        const teleportZInput = document.getElementById('teleportZ');
+        const teleportBtn = document.getElementById('teleportBtn');
+
+
+        init();
+        animate();
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            const bodyStyles = getComputedStyle(document.body);
+            scene.background = new THREE.Color(bodyStyles.getPropertyValue('--bg-color'));
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 20000);
+            camera.position.set(10, 10, 10);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+            
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Stats.js
+            stats = new Stats();
+            document.getElementById('stats-js').appendChild(stats.dom);
+
+            // Helpers
+            const gridHelper = new THREE.GridHelper(10000, 10000);
+            scene.add(gridHelper);
+            axesHelper = new THREE.AxesHelper(1000);
+            scene.add(axesHelper);
+            
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
+            fileInput.addEventListener('change', handleFileSelect);
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', handleDragOver);
+            dropzone.addEventListener('dragleave', handleDragLeave);
+            dropzone.addEventListener('drop', handleFileDrop);
+            showEdgesCheckbox.addEventListener('change', toggleEdges);
+            showAxesCheckbox.addEventListener('change', toggleAxesHelper);
+            scaleSlider.addEventListener('input', handleScaleChange);
+            resetScaleBtn.addEventListener('click', resetScale);
+            deleteModelBtn.addEventListener('click', cleanScene);
+            teleportBtn.addEventListener('click', handleTeleport);
+
+            // Theme change listener
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                const newColorScheme = e.matches ? "dark" : "light";
+                const newBgColor = getComputedStyle(document.body).getPropertyValue(`--bg-color-${newColorScheme}`);
+                scene.background = new THREE.Color(newBgColor);
+            });
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            stats.update();
+            
+            // Update camera coordinates
+            const camPos = camera.position;
+            coordsOutput.textContent = `カメラ座標: X:${camPos.x.toFixed(2)} Y:${camPos.y.toFixed(2)} Z:${camPos.z.toFixed(2)}`;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- File Handling ---
+        function handleFileSelect(event) {
+            loadFile(event.target.files[0]);
+        }
+        
+        function handleDragOver(event) {
+            event.preventDefault();
+            dropzone.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            dropzone.classList.remove('dragover');
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (event.dataTransfer.files.length > 0) {
+                loadFile(event.dataTransfer.files[0]);
+            }
+        }
+        
+        async function loadFile(file) {
+            if (!file) return;
+
+            cleanScene();
+            fileInfo = { name: file.name, size: file.size };
+            statsOutput.innerHTML = '<p>読み込み中...</p>';
+
+            const fileName = file.name;
+            const extension = fileName.split('.').pop().toLowerCase();
+            
+            if (extension === 'zip') {
+                await handleZipFile(file);
+            } else {
+                const url = URL.createObjectURL(file);
+                loadModel(url, extension);
+            }
+        }
+
+        async function handleZipFile(file) {
+            const jszip = new JSZip();
+            const zip = await jszip.loadAsync(file);
+            
+            const objectURLs = {};
+            const filesToLoad = [];
+
+            for (const filename in zip.files) {
+                if (!zip.files[filename].dir) {
+                    filesToLoad.push({ filename, promise: zip.files[filename].async('blob') });
+                }
+            }
+
+            const blobs = await Promise.all(filesToLoad.map(f => f.promise));
+            filesToLoad.forEach((f, i) => { objectURLs[f.filename] = URL.createObjectURL(blobs[i]); });
+
+            const manager = new THREE.LoadingManager();
+            manager.setURLModifier((url) => {
+                const found = Object.keys(objectURLs).find(key => key.endsWith(url.split('/').pop()));
+                return objectURLs[found] || url;
+            });
+            
+            const modelFile = Object.keys(objectURLs).find(f => /\.(gltf|glb|obj|fbx|stl)$/i.test(f));
+            if (modelFile) {
+                const extension = modelFile.split('.').pop().toLowerCase();
+                loadModel(objectURLs[modelFile], extension, manager);
+            } else {
+                statsOutput.innerHTML = '<p>ZIP内に対応モデルが見つかりません。</p>';
+            }
+        }
+
+        function loadModel(url, extension, manager = new THREE.LoadingManager()) {
+            let loader;
+            switch (extension) {
+                case 'glb': case 'gltf': loader = new GLTFLoader(manager); break;
+                case 'obj': loader = new OBJLoader(manager); break;
+                case 'fbx': loader = new FBXLoader(manager); break;
+                case 'stl': loader = new STLLoader(manager); break;
+                default:
+                    statsOutput.innerHTML = `<p>非対応の形式です: .${extension}</p>`;
+                    return;
+            }
+
+            loader.load(url, (loadedObject) => {
+                let actualModel;
+                if (extension === 'gltf' || extension === 'glb') {
+                    fullGltfData = loadedObject;
+                    actualModel = loadedObject.scene;
+                } else if (extension === 'stl') {
+                    const material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0x111111, shininess: 200 });
+                    actualModel = new THREE.Mesh(loadedObject, material);
+                } else {
+                    actualModel = loadedObject;
+                }
+                
+                modelWrapper = new THREE.Group();
+                scene.add(modelWrapper);
+                fitAndCenterObject(actualModel, modelWrapper);
+
+                updateStats();
+                if (showEdgesCheckbox.checked) { createEdges(actualModel); }
+                
+                deleteModelBtn.style.display = 'block';
+
+            }, 
+            (xhr) => { if (xhr.lengthComputable) statsOutput.innerHTML = `<p>読み込み中: ${(xhr.loaded / xhr.total * 100).toFixed(0)}%</p>`; },
+            (error) => { console.error(error); statsOutput.innerHTML = '<p>モデルの読み込みに失敗しました。</p>'; }
+            );
+        }
+        
+        function cleanScene() {
+            deleteModelBtn.style.display = 'none';
+
+            if (modelWrapper) {
+                scene.remove(modelWrapper);
+                modelWrapper.traverse(object => {
+                    if (object.isMesh) {
+                        if (object.geometry) object.geometry.dispose();
+                        if (Array.isArray(object.material)) {
+                            object.material.forEach(material => { if (material.map) material.map.dispose(); material.dispose(); });
+                        } else if (object.material) {
+                            if (object.material.map) object.material.map.dispose();
+                            object.material.dispose();
+                        }
+                    }
+                });
+                modelWrapper = null;
+            }
+            
+            // OrbitControlsのカメラ距離制限と初期値をリセット
+            controls.minDistance = 0;
+            controls.maxDistance = Infinity;
+            initialModelSize = 0;
+            initialCameraDistance = 0;
+
+            fullGltfData = null;
+            showEdgesCheckbox.checked = false;
+            resetScale();
+            statsOutput.innerHTML = '<p id="info-text">モデルを読み込んでください</p>';
+        }
+
+        function fitAndCenterObject(object, wrapper) {
+            wrapper.add(object);
+            const box = new THREE.Box3().setFromObject(object);
+            const center = box.getCenter(new THREE.Vector3());
+            object.position.x -= center.x;
+            object.position.y -= box.min.y;
+            object.position.z -= center.z;
+
+            const finalBox = new THREE.Box3().setFromObject(wrapper);
+            const size = finalBox.getSize(new THREE.Vector3());
+            const wrapperCenter = finalBox.getCenter(new THREE.Vector3());
+            
+            const maxSize = Math.max(size.x, size.y, size.z);
+            const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+            const fitWidthDistance = fitHeightDistance / camera.aspect;
+            const distance = 1.5 * Math.max(fitHeightDistance, fitWidthDistance);
+            
+            // 初期値を保存
+            initialModelSize = maxSize;
+            initialCameraDistance = distance;
+
+            controls.target.copy(wrapperCenter);
+            camera.near = distance / 100;
+            camera.far = distance * 100;
+            camera.updateProjectionMatrix();
+            camera.position.copy(wrapperCenter);
+            camera.position.z += distance;
+
+            // 操作性の破綻を防ぐために、カメラの移動範囲を制限する
+            controls.minDistance = initialModelSize * 0.1;
+            controls.maxDistance = initialCameraDistance * 50;
+
+            controls.update();
+        }
+
+        // --- UI Functions ---
+        function updateStats() {
+            if (!modelWrapper) return;
+            
+            const stats = {
+                vertices: 0, triangles: 0, objects: 0, lights: 0, cameras: 0,
+                geometries: new Set(), materials: new Set(), textures: new Set()
+            };
+            const actualModel = modelWrapper.children[0];
+
+            actualModel.traverse((child) => {
+                if (child.isMesh) {
+                    stats.objects++;
+                    if (child.geometry) {
+                        stats.geometries.add(child.geometry.uuid);
+                        stats.vertices += child.geometry.attributes.position.count;
+                        stats.triangles += (child.geometry.index) ? child.geometry.index.count / 3 : child.geometry.attributes.position.count / 3;
+                    }
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(m => collectMaterialInfo(m, stats));
+                    } else if (child.material) {
+                        collectMaterialInfo(child.material, stats);
+                    }
+                } else if (child.isLight) { stats.lights++; } 
+                  else if (child.isCamera) { stats.cameras++; }
+            });
+
+            const animationsCount = fullGltfData?.animations?.length || 0;
+            const box = new THREE.Box3().setFromObject(modelWrapper);
+            const size = box.getSize(new THREE.Vector3());
+
+            statsOutput.innerHTML = `
+                <h3>モデル情報</h3>
+                <p><strong>ファイル名:</strong> ${fileInfo.name}</p>
+                <p><strong>ファイルサイズ:</strong> ${(fileInfo.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p><strong>寸法 (W/H/D):</strong> ${size.x.toFixed(2)} / ${size.y.toFixed(2)} / ${size.z.toFixed(2)}</p>
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 5px 0;">
+                <p><strong>頂点数:</strong> ${stats.vertices.toLocaleString()}</p>
+                <p><strong>三角形数:</strong> ${Math.floor(stats.triangles).toLocaleString()}</p>
+                <p><strong>オブジェクト数:</strong> ${stats.objects.toLocaleString()}</p>
+                <p><strong>ジオメトリ数:</strong> ${stats.geometries.size.toLocaleString()}</p>
+                <p><strong>マテリアル数:</strong> ${stats.materials.size.toLocaleString()}</p>
+                <p><strong>テクスチャ数:</strong> ${stats.textures.size.toLocaleString()}</p>
+                <p><strong>アニメーション数:</strong> ${animationsCount}</p>
+                <p><strong>ライト数:</strong> ${stats.lights}</p>
+                <p><strong>カメラ数:</strong> ${stats.cameras}</p>
+            `;
+        }
+        
+        function collectMaterialInfo(material, stats) {
+            stats.materials.add(material.uuid);
+            for (const key in material) {
+                if (material[key] instanceof THREE.Texture) {
+                    stats.textures.add(material[key].uuid);
+                }
+            }
+        }
+
+        function handleScaleChange(e) {
+            if (modelWrapper) {
+                const scale = parseFloat(e.target.value);
+                modelWrapper.scale.set(scale, scale, scale);
+                
+                // スケールに合わせてカメラの距離制限を動的に更新
+                if (initialModelSize > 0 && initialCameraDistance > 0) {
+                    controls.minDistance = initialModelSize * 0.1 * scale;
+                    controls.maxDistance = initialCameraDistance * 50 * scale;
+                }
+
+                updateStats(); // スケール変更で寸法が変わるので情報を更新
+            }
+        }
+        
+        function resetScale() {
+            if (modelWrapper) {
+                modelWrapper.scale.set(1, 1, 1);
+
+                // スケールリセット時にカメラ距離制限もリセット
+                if (initialModelSize > 0 && initialCameraDistance > 0) {
+                    controls.minDistance = initialModelSize * 0.1;
+                    controls.maxDistance = initialCameraDistance * 50;
+                }
+                
+                updateStats();
+            }
+            scaleSlider.value = 1;
+        }
+
+        function toggleEdges() {
+            if (!modelWrapper) return;
+            const actualModel = modelWrapper.children[0];
+            if (showEdgesCheckbox.checked) {
+                createEdges(actualModel);
+            } else {
+                removeEdges(actualModel);
+            }
+        }
+        
+        function toggleAxesHelper() {
+            axesHelper.visible = showAxesCheckbox.checked;
+        }
+        
+        function handleTeleport() {
+            const x = parseFloat(teleportXInput.value);
+            const y = parseFloat(teleportYInput.value);
+            const z = parseFloat(teleportZInput.value);
+
+            if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+                camera.position.set(x, y, z);
+                controls.update();
+            } else {
+                alert('有効な数値をすべての座標に入力してください。');
+            }
+        }
+
+        function createEdges(object) {
+            object.traverse((child) => {
+                if (child.isMesh && !child.children.some(c => c.userData.isEdge)) {
+                    const edges = new THREE.EdgesGeometry(child.geometry, 1);
+                    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x03a9f4, transparent: true, opacity: 0.8 }));
+                    line.userData.isEdge = true;
+                    child.add(line);
+                }
+            });
+        }
+
+        function removeEdges(object) {
+            const edgesToRemove = [];
+            object.traverse(child => {
+                child.children.forEach(grandchild => {
+                    if (grandchild.userData.isEdge) edgesToRemove.push(grandchild);
+                });
+            });
+            edgesToRemove.forEach(edge => {
+                edge.parent.remove(edge);
+                edge.geometry.dispose();
+                edge.material.dispose();
+            });
+        }
+    </script>
+</body>
+</html>
