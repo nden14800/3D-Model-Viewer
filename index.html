@@ -6,312 +6,203 @@
     <title>3Dモデルビューア</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS: スタイル設定 */
         :root {
-            --bg-color-light: #f0f0f0;
-            --text-color-light: #212121;
-            --ui-bg-color-light: rgba(255, 255, 255, 0.85);
-            --border-color-light: #cccccc;
-            --button-bg-light: #e0e0e0;
-            --button-hover-bg-light: #d5d5d5;
-            --delete-button-bg-light: #d32f2f;
-            --delete-button-hover-bg-light: #c62828;
-            --scrollbar-thumb-light: #b0b0b0;
-            --scrollbar-track-light: #e0e0e0;
+            --bg-color-light: #f0f2f5; --text-color-light: #1f2328; --ui-bg-color-light: rgba(255, 255, 255, 0.9);
+            --border-color-light: #d0d7de; --button-bg-light: #f6f8fa; --button-hover-bg-light: #eef1f4;
+            --scrollbar-thumb-light: #b0b0b0; --scrollbar-track-light: #e0e0e0; --tab-active-bg-light: #0969da;
+            --tab-inactive-bg-light: transparent; --list-item-hover-light: #f0f2f5;
 
-            --bg-color-dark: #121212;
-            --text-color-dark: #e0e0e0;
-            --ui-bg-color-dark: rgba(40, 40, 40, 0.85);
-            --border-color-dark: #444444;
-            --button-bg-dark: #333333;
-            --button-hover-bg-dark: #454545;
-            --delete-button-bg-dark: #d32f2f;
-            --delete-button-hover-bg-dark: #c62828;
-            --scrollbar-thumb-dark: #555;
-            --scrollbar-track-dark: #333;
+            --bg-color-dark: #0d1117; --text-color-dark: #c9d1d9; --ui-bg-color-dark: rgba(22, 27, 34, 0.9);
+            --border-color-dark: #30363d; --button-bg-dark: #21262d; --button-hover-bg-dark: #30363d;
+            --scrollbar-thumb-dark: #555; --scrollbar-track-dark: #333; --tab-active-bg-dark: #0969da;
+            --tab-inactive-bg-dark: transparent; --list-item-hover-dark: #21262d;
 
-            --accent-color: #03a9f4;
+            --accent-color: #0969da; --text-color-white: #ffffff; --highlight-color: #00ff00;
         }
 
-        /* デフォルトはライトモード */
         body {
-            --bg-color: var(--bg-color-light);
-            --text-color: var(--text-color-light);
-            --ui-bg-color: var(--ui-bg-color-light);
-            --border-color: var(--border-color-light);
-            --button-bg: var(--button-bg-light);
-            --button-hover-bg: var(--button-hover-bg-light);
-            --delete-button-bg: var(--delete-button-bg-light);
-            --delete-button-hover-bg: var(--delete-button-hover-bg-light);
-            --scrollbar-thumb: var(--scrollbar-thumb-light);
-            --scrollbar-track: var(--scrollbar-track-light);
+            --bg-color: var(--bg-color-light); --text-color: var(--text-color-light); --ui-bg-color: var(--ui-bg-color-light);
+            --border-color: var(--border-color-light); --button-bg: var(--button-bg-light); --button-hover-bg: var(--button-hover-bg-light);
+            --scrollbar-thumb: var(--scrollbar-thumb-light); --scrollbar-track: var(--scrollbar-track-light);
+            --tab-active-bg: var(--tab-active-bg-light); --tab-inactive-bg: var(--tab-inactive-bg-light);
+            --list-item-hover: var(--list-item-hover-light);
         }
 
-        /* ダークモード設定を検知 */
         @media (prefers-color-scheme: dark) {
             body {
-                --bg-color: var(--bg-color-dark);
-                --text-color: var(--text-color-dark);
-                --ui-bg-color: var(--ui-bg-color-dark);
-                --border-color: var(--border-color-dark);
-                --button-bg: var(--button-bg-dark);
-                --button-hover-bg: var(--button-hover-bg-dark);
-                --delete-button-bg: var(--delete-button-bg-dark);
-                --delete-button-hover-bg: var(--delete-button-hover-bg-dark);
-                --scrollbar-thumb: var(--scrollbar-thumb-dark);
-                --scrollbar-track: var(--scrollbar-track-dark);
+                --bg-color: var(--bg-color-dark); --text-color: var(--text-color-dark); --ui-bg-color: var(--ui-bg-color-dark);
+                --border-color: var(--border-color-dark); --button-bg: var(--button-bg-dark); --button-hover-bg: var(--button-hover-bg-dark);
+                --scrollbar-thumb: var(--scrollbar-thumb-dark); --scrollbar-track: var(--scrollbar-track-dark);
+                --tab-active-bg: var(--tab-active-bg-dark); --tab-inactive-bg: var(--tab-inactive-bg-dark);
+                --list-item-hover: var(--list-item-hover-dark);
             }
         }
 
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-
-        #container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        #ui {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 10;
-            background-color: var(--ui-bg-color);
-            padding: 15px;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 320px;
-            font-size: 14px;
-            max-height: calc(100vh - 30px); /* UIの最大高さを設定 */
-            overflow-y: auto; /* 内容がはみ出た場合にスクロール */
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
+        #container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        button { font-family: 'Roboto', sans-serif; }
         
-        /* スクロールバーのデザイン */
-        #ui::-webkit-scrollbar { width: 8px; }
-        #ui::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 4px; }
-        #ui::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
-        #ui::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
+        .loader { width: 60px; height: 60px; animation: rotate 1s linear infinite; transform-origin: center center; }
+        .loader .path { stroke: var(--text-color-white); stroke-linecap: round; stroke-dasharray: 89 150; stroke-dashoffset: 0; }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
 
-        #hideUiBtn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 24px;
-            height: 24px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            color: var(--text-color);
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-        #hideUiBtn:hover { opacity: 1; }
-        #hideUiBtn svg { width: 16px; height: 16px; }
+        #startup-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; padding: 20px; box-sizing: border-box; background-color: rgba(0,0,0,0.1); backdrop-filter: blur(2px); }
+        #startup-title-main { font-size: 2.5rem; font-weight: 700; margin: 0 0 24px 0; }
+        #startup-title-topleft { position: absolute; top: 20px; left: 20px; font-size: 1.5rem; font-weight: 500; }
+        #help-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-color); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        #help-btn:hover { background-color: rgba(128,128,128,0.2); }
+        #help-btn svg { width: 24px; height: 24px; }
+        #startup-dropzone { width: 100%; max-width: 500px; background-color: var(--ui-bg-color); backdrop-filter: blur(5px); border: 2px dashed var(--border-color); border-radius: 12px; padding: 30px; cursor: pointer; transition: background-color 0.2s; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        #startup-dropzone.dragover { background-color: rgba(9, 105, 218, 0.1); }
+        #startup-dropzone svg { width: 48px; height: 48px; opacity: 0.7; color: var(--accent-color); }
+        #startup-dropzone p { margin: 0; font-size: 1.1rem; }
+        #startup-selectFileBtn { font-size: 1rem; padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--button-bg); color: var(--text-color); cursor: pointer; transition: background-color 0.2s; }
+        #startup-selectFileBtn:hover { background-color: var(--button-hover-bg); }
 
-        #showUiBtn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 11;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            background-color: var(--ui-bg-color);
-            backdrop-filter: blur(5px);
-            color: var(--text-color);
-            border-radius: 8px;
-            cursor: pointer;
-            display: none; /* 初期状態は非表示 */
-        }
+        #help-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 101; justify-content: center; align-items: center; }
+        .help-content { background-color: var(--ui-bg-color); width: 90%; max-width: 800px; max-height: 80vh; border-radius: 12px; padding: 25px; overflow-y: auto; position: relative; }
+        .help-content h2 { margin-top: 0; }
+        .help-content h3 { margin: 20px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        .help-content p, .help-content li { line-height: 1.6; }
+        #close-help-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; color: var(--text-color); }
+        #close-help-btn svg { width: 24px; height: 24px; }
         
-        #dropzone {
-            border: 2px dashed var(--border-color);
-            border-radius: 5px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        #dropzone svg {
-            width: 32px;
-            height: 32px;
-            opacity: 0.7;
-        }
-        #dropzone p { margin: 0; }
-        #dropzone.dragover { background-color: rgba(3, 169, 244, 0.2); }
-        #fileInput { display: none; }
+        #main-ui-container { display: none; }
+        #header { position: fixed; top: 0; left: 0; width: 100%; z-index: 20; display: flex; justify-content: space-between; align-items: center; padding: 15px; pointer-events: none; }
+        #site-title { font-size: 1.5rem; font-weight: 500; cursor: pointer; pointer-events: auto; }
+        #stats-js { position: static; pointer-events: auto; }
         
-        .control-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        .control-group label { white-space: nowrap; }
+        .panel-container { display: flex; position: fixed; top: 0; height: 100%; z-index: 10; pointer-events: none; align-items: center; }
+        #left-panel-container { left: 15px; }
+        #right-panel-container { right: 15px; flex-direction: row-reverse; }
+        
+        .tab-header-vertical { display: flex; flex-direction: column; background-color: var(--ui-bg-color); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 8px; pointer-events: auto; }
+        .tab-btn { background-color: var(--tab-inactive-bg); border: none; padding: 12px; cursor: pointer; color: var(--text-color); transition: background-color 0.2s, color 0.2s; }
+        .tab-btn.active, .tab-btn:hover { background-color: var(--tab-active-bg); color: var(--text-color-white); }
+        .tab-btn svg { width: 24px; height: 24px; display: block; }
+        
+        .panel-content-wrapper { width: 300px; background-color: var(--ui-bg-color); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 8px; display: none; flex-direction: column; max-height: calc(100vh - 120px); pointer-events: auto; }
+        .panel-content-wrapper.visible { display: flex; }
+        
+        .tab-content { display: none; flex-direction: column; gap: 15px; padding: 15px; overflow-y: auto; height: 100%; }
+        .tab-content.active { display: flex; }
+        .tab-content::-webkit-scrollbar { width: 8px; }
+        .tab-content::-webkit-scrollbar-track { background: transparent; }
+        .tab-content::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+        .tab-content::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
+        h3 { margin: 0; font-size: 1rem; font-weight: 500; }
+        hr { border: none; border-top: 1px solid var(--border-color); }
+        .list-item { padding: 8px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .list-item:hover { background-color: var(--list-item-hover); }
+        .list-item.selected { background-color: var(--accent-color); color: var(--text-color-white); }
+        .list-item .name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .visibility-toggle { background: none; border: none; padding: 4px; cursor: pointer; color: var(--text-color); line-height: 0; }
+        .list-item.selected .visibility-toggle { color: var(--text-color-white); }
+        .visibility-toggle svg { width: 16px; height: 16px; }
+
+        .control-group { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .control-group label { white-space: nowrap; font-size: 0.9rem; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent-color); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        
-        input[type="range"] { flex-grow: 1; }
-        
-        button {
-            padding: 6px 10px;
-            border: 1px solid var(--border-color);
-            background-color: var(--button-bg);
-            color: var(--text-color);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
+        .slider-switch { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider-switch:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider-switch { background-color: var(--accent-color); }
+        input:checked + .slider-switch:before { transform: translateX(20px); }
+        button { padding: 6px 10px; border: 1px solid var(--border-color); background-color: var(--button-bg); color: var(--text-color); border-radius: 6px; cursor: pointer; transition: background-color 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         button:hover { background-color: var(--button-hover-bg); }
-        button svg { width: 16px; height: 16px; }
-        
-        #deleteModelBtn {
-            width: 100%;
-            padding: 8px;
-            background-color: var(--delete-button-bg);
-            color: white;
-            border: none;
-            font-weight: bold;
-        }
-        #deleteModelBtn:hover { background-color: var(--delete-button-hover-bg); }
-        
-        #teleport-section { padding-top: 10px; border-top: 1px solid var(--border-color); }
-        #teleport-section h3 { margin: 0 0 8px 0; font-size: 1em; }
-        .teleport-controls { display: flex; gap: 5px; align-items: center; }
-        .teleport-controls input[type="number"] {
-            width: 55px; padding: 4px; background-color: var(--bg-color); color: var(--text-color);
-            border: 1px solid var(--border-color); border-radius: 4px; -moz-appearance: textfield;
-        }
-        .teleport-controls input[type="number"]::-webkit-outer-spin-button,
-        .teleport-controls input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .teleport-controls button { flex-grow: 1; }
-
-        #info-panel { padding-top: 10px; border-top: 1px solid var(--border-color); }
-        #info-panel h3 { margin: 0 0 8px 0; font-size: 1em; }
-        #info-panel p { margin: 2px 0; font-size: 0.9em; line-height: 1.5; }
-        
-        #stats-js { position: absolute; top: 15px; right: 15px; }
     </style>
 </head>
 <body>
     <div id="container"></div>
-
-    <button id="showUiBtn">UIを表示</button>
-
-    <div id="ui">
-        <button id="hideUiBtn" title="UIを非表示">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-            </svg>
+    <div id="loading-overlay"><svg class="loader" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle></svg></div>
+    
+    <div id="startup-screen">
+        <h1 id="startup-title-topleft">3D Viewer</h1>
+        <button id="help-btn" title="使い方">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/></svg>
         </button>
-        <div id="dropzone">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/>
-                <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/>
-            </svg>
-            <p>ここにファイルをドラッグ＆ドロップ</p>
-            <button id="selectFileBtn">またはファイルを選択</button>
-            <input type="file" id="fileInput">
+        <h1 id="startup-title-main">3D Model Viewer</h1>
+        <div id="startup-dropzone">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/><path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/></svg>
+            <p>ここにファイルをドラッグ＆ドロップ</p><button id="startup-selectFileBtn">またはファイルを選択</button>
         </div>
-        
-        <div class="control-group">
-            <label for="showEdges">エッジ表示</label>
-            <label class="switch"><input type="checkbox" id="showEdges"><span class="slider"></span></label>
-        </div>
-        
-        <div class="control-group">
-            <label for="showAxes">座標軸表示</label>
-            <label class="switch"><input type="checkbox" id="showAxes" checked><span class="slider"></span></label>
-        </div>
+        <input type="file" id="file-input" style="display: none;">
+    </div>
 
-        <div class="control-group">
-            <label for="showGrid">地面グリッド表示</label>
-            <label class="switch"><input type="checkbox" id="showGrid" checked><span class="slider"></span></label>
+    <div id="help-modal">
+        <div class="help-content">
+            <button id="close-help-btn" title="閉じる"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button>
+            <h2>使い方ガイド</h2>
+            <h3>1. ファイルの読み込み</h3>
+            <p>3Dモデルをビューアに読み込むには、2つの方法があります。</p>
+            <ul>
+                <li><b>ドラッグ＆ドロップ:</b> ファイルを画面中央の点線枠内にドラッグ＆ドロップします。</li>
+                <li><b>ファイルを選択:</b>「またはファイルを選択」ボタンをクリックし、ファイルダイアログからファイルを選択します。</li>
+            </ul>
+            <p>対応形式: .glb, .gltf, .obj, .fbx, .stl, .zip (モデルとテクスチャを含む)</p>
+            <h3>2. 別のファイルを読み込む</h3>
+            <p>新しいモデルを表示したい場合は、画面左上のタイトル「3D Viewer」をクリックしてください。スタート画面に戻り、新しいファイルを読み込むことができます。</p>
+            <h3>3. メイン画面の操作</h3>
+            <p>モデルを読み込むと、操作用のUIが表示されます。</p>
+            <h4>左側タブ</h4>
+            <ul>
+                <li><b>ファイル:</b> 読み込んだファイル（ZIPの場合はその中身）の一覧を表示します。</li>
+                <li><b>材料:</b> モデルに含まれるマテリアル（材質）の一覧を表示します。</li>
+                <li><b>メッシュ:</b> モデルを構成する個別のオブジェクト（メッシュ）を一覧表示します。各オブジェクト名をクリックすると、その部分が緑色にハイライトされ、詳細情報が右パネルに表示されます。目のアイコンで、オブジェクトの表示/非表示を切り替えられます。</li>
+            </ul>
+            <h4>右側タブ</h4>
+            <ul>
+                <li><b>詳細:</b> モデル全体、またはメッシュタブで選択した個別オブジェクトの情報を表示します（寸法、頂点数など）。</li>
+                <li><b>モデル表示:</b> ビューポートの表示設定やモデルの操作を行います。
+                    <ul>
+                        <li><b>表示設定:</b> エッジ、座標軸、地面グリッド、パフォーマンス統計(FPS)の表示/非表示を切り替えられます。</li>
+                        <li><b>モデル操作:</b> スライダーでモデルのサイズを変更したり、リセットボタンで初期サイズに戻せます。</li>
+                        <li><b>カメラ操作:</b> 「ズームをリセット」ボタンで、モデル全体が見える初期のカメラ位置に戻します。</li>
+                    </ul>
+                </li>
+            </ul>
+             <h3>4. 画面操作</h3>
+            <ul>
+                <li><b>回転:</b> マウスの左ボタン（または指一本）でドラッグします。</li>
+                <li><b>移動:</b> マウスの右ボタン（または指二本）でドラッグします。</li>
+                <li><b>ズーム:</b> マウスホイール（またはピンチイン/アウト）で拡大・縮小します。</li>
+            </ul>
         </div>
+    </div>
 
-        <div class="control-group">
-            <label for="modelScale">モデルサイズ</label>
-            <input type="range" id="modelScale" min="0.1" max="5" step="0.05" value="1">
-            <button id="resetScale" title="サイズをリセット">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
-                    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
-                    <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
-                </svg>
-            </button>
-        </div>
-
-        <button id="deleteModelBtn" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-            </svg>
-            モデルを削除
-        </button>
-        
-        <div id="teleport-section">
-            <h3>テレポート</h3>
-            <div class="teleport-controls">
-                <input type="number" id="teleportX" placeholder="X">
-                <input type="number" id="teleportY" placeholder="Y">
-                <input type="number" id="teleportZ" placeholder="Z">
-                <button id="teleportBtn">移動</button>
+    <div id="main-ui-container">
+        <div id="header"><h1 id="site-title">3D Viewer</h1><div id="stats-js"></div></div>
+        <div id="left-panel-container" class="panel-container">
+            <div id="left-tab-header" class="tab-header-vertical">
+                <button class="tab-btn" data-panel="left" data-tab="files-tab" title="ファイル"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z"/></svg></button>
+                <button class="tab-btn" data-panel="left" data-tab="materials-tab" title="材料"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M6.192 2.78c-.458-.677-.927-1.248-1.35-1.643a3 3 0 0 0-.71-.515c-.217-.104-.56-.205-.882-.02-.367.213-.427.63-.43.896-.003.304.064.664.173 1.044.196.687.556 1.528 1.035 2.402L.752 8.22c-.277.277-.269.656-.218.918.055.283.187.593.36.903.348.627.92 1.361 1.626 2.068.707.707 1.441 1.278 2.068 1.626.31.173.62.305.903.36.262.05.64.059.918-.218l5.615-5.615c.118.257.092.512.05.939-.03.292-.068.665-.073 1.176v.123h.003a1 1 0 0 0 1.993 0H14v-.057a1 1 0 0 0-.004-.117c-.055-1.25-.7-2.738-1.86-3.494a4 4 0 0 0-.211-.434c-.349-.626-.92-1.36-1.627-2.067S8.857 3.052 8.23 2.704c-.31-.172-.62-.304-.903-.36-.262-.05-.64-.058-.918.219zM4.16 1.867c.381.356.844.922 1.311 1.632l-.704.705c-.382-.727-.66-1.402-.813-1.938a3.3 3.3 0 0 1-.131-.673q.137.09.337.274m.394 3.965c.54.852 1.107 1.567 1.607 2.033a.5.5 0 1 0 .682-.732c-.453-.422-1.017-1.136-1.564-2.027l1.088-1.088q.081.181.183.365c.349.627.92 1.361 1.627 2.068.706.707 1.44 1.278 2.068 1.626q.183.103.365.183l-4.861 4.862-.068-.01c-.137-.027-.342-.104-.608-.252-.524-.292-1.186-.8-1.846-1.46s-1.168-1.32-1.46-1.846c-.147-.265-.225-.47-.251-.607l-.01-.068zm2.87-1.935a2.4 2.4 0 0 1-.241-.561c.135.033.324.11.562.241.524.292 1.186.8 1.846 1.46.45.45.83.901 1.118 1.31a3.5 3.5 0 0 0-1.066.091 11 11 0 0 1-.76-.694c-.66-.66-1.167-1.322-1.458-1.847z"/></svg></button>
+                <button class="tab-btn" data-panel="left" data-tab="meshes-tab" title="メッシュ"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/></svg></button>
+            </div>
+            <div id="left-panel-content" class="panel-content-wrapper">
+                <div id="files-tab" class="tab-content"></div><div id="materials-tab" class="tab-content"></div><div id="meshes-tab" class="tab-content"></div>
             </div>
         </div>
-
-        <div id="info-panel">
-            <h3>情報</h3>
-            <p id="coords-output">カメラ座標: X:0 Y:0 Z:0</p>
-            <div id="stats-output">
-                <p id="info-text">モデルを読み込んでください</p>
+        <div id="right-panel-container" class="panel-container">
+            <div id="right-tab-header" class="tab-header-vertical">
+                <button class="tab-btn" data-panel="right" data-tab="details-tab" title="詳細"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/><path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/></svg></button>
+                <button class="tab-btn" data-panel="right" data-tab="display-tab" title="モデル表示"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/></svg></button>
+            </div>
+            <div id="right-panel-content" class="panel-content-wrapper">
+                <div id="details-tab" class="tab-content"><div id="stats-output" class="content-section"><p>モデルを読み込んでください</p></div></div>
+                <div id="display-tab" class="tab-content">
+                    <div class="content-section"><h3>表示設定</h3><div class="control-group"><label for="showEdges">エッジ表示</label><label class="switch"><input type="checkbox" id="showEdges"><span class="slider-switch"></span></label></div><div class="control-group"><label for="showAxes">座標軸表示</label><label class="switch"><input type="checkbox" id="showAxes" checked><span class="slider-switch"></span></label></div><div class="control-group"><label for="showGrid">地面グリッド表示</label><label class="switch"><input type="checkbox" id="showGrid" checked><span class="slider-switch"></span></label></div><div class="control-group"><label for="showStats">パフォーマンス表示</label><label class="switch"><input type="checkbox" id="showStats" checked><span class="slider-switch"></span></label></div></div><hr/><div class="content-section"><h3>モデル操作</h3><div class="control-group"><label for="modelScale">モデルサイズ</label><input type="range" id="modelScale" min="0.1" max="5" step="0.05" value="1"><button id="resetScale" title="サイズをリセット"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41M-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/></svg></button></div></div><hr/><div class="content-section"><h3>カメラ操作</h3><button id="reset-zoom-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/></svg>ズームをリセット</button></div>
+                </div>
             </div>
         </div>
     </div>
     
-    <div id="stats-js"></div>
-
-    <!-- ライブラリ -->
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-    }
-    </script>
+    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-    <!-- メインのJSコード -->
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -322,351 +213,294 @@
         import Stats from 'three/addons/libs/stats.module.js';
 
         let scene, camera, renderer, controls, stats, axesHelper, gridHelper;
-        let modelWrapper;
-        let fileInfo = { name: '', size: 0 };
-        let fullGltfData;
-        let initialModelSize = 0;
-        let initialCameraDistance = 0;
-
-        const container = document.getElementById('container');
-        const uiPanel = document.getElementById('ui');
-        const hideUiBtn = document.getElementById('hideUiBtn');
-        const showUiBtn = document.getElementById('showUiBtn');
-        const statsJsPanel = document.getElementById('stats-js');
-        const fileInput = document.getElementById('fileInput');
-        const dropzone = document.getElementById('dropzone');
-        const selectFileBtn = document.getElementById('selectFileBtn');
-        const showEdgesCheckbox = document.getElementById('showEdges');
-        const showAxesCheckbox = document.getElementById('showAxes');
-        const showGridCheckbox = document.getElementById('showGrid');
-        const statsOutput = document.getElementById('stats-output');
-        const coordsOutput = document.getElementById('coords-output');
-        const scaleSlider = document.getElementById('modelScale');
-        const resetScaleBtn = document.getElementById('resetScale');
-        const deleteModelBtn = document.getElementById('deleteModelBtn');
-        const teleportXInput = document.getElementById('teleportX');
-        const teleportYInput = document.getElementById('teleportY');
-        const teleportZInput = document.getElementById('teleportZ');
-        const teleportBtn = document.getElementById('teleportBtn');
-
+        let modelWrapper, fileInfo = {}, fileList = [], fullGltfData, selectedObject, originalMaterial;
+        let initialModelSize = 0, initialCameraDistance = 0, initialCameraPosition = new THREE.Vector3(), initialControlsTarget = new THREE.Vector3();
+        const highlightMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x55ff55, roughness: 0.4, metalness: 0.1 });
+        const visibleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>`;
+        const hiddenIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/><path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/></svg>`;
+        const elements = { container: document.getElementById('container'), loadingOverlay: document.getElementById('loading-overlay'), startupScreen: document.getElementById('startup-screen'), mainUiContainer: document.getElementById('main-ui-container'), siteTitle: document.getElementById('site-title'), statsJsPanel: document.getElementById('stats-js'), helpBtn: document.getElementById('help-btn'), helpModal: document.getElementById('help-modal'), closeHelpBtn: document.getElementById('close-help-btn'), leftPanelContent: document.getElementById('left-panel-content'), rightPanelContent: document.getElementById('right-panel-content'), fileInput: document.getElementById('file-input'), startupDropzone: document.getElementById('startup-dropzone'), statsOutput: document.getElementById('stats-output'), showEdges: document.getElementById('showEdges'), showAxes: document.getElementById('showAxes'), showGrid: document.getElementById('showGrid'), showStats: document.getElementById('showStats'), modelScale: document.getElementById('modelScale'), resetScale: document.getElementById('resetScale'), resetZoomBtn: document.getElementById('reset-zoom-btn'), filesTab: document.getElementById('files-tab'), materialsTab: document.getElementById('materials-tab'), meshesTab: document.getElementById('meshes-tab') };
+        const START_CAMERA_POS = new THREE.Vector3(10, 10, 10);
 
         init();
         animate();
 
         function init() {
-            // Scene
             scene = new THREE.Scene();
-            const bodyStyles = getComputedStyle(document.body);
-            scene.background = new THREE.Color(bodyStyles.getPropertyValue('--bg-color'));
-
-            // Camera
+            scene.background = new THREE.Color(getComputedStyle(document.body).getPropertyValue('--bg-color'));
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 20000);
-            camera.position.set(10, 10, 10);
-
-            // Renderer
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-            
-            // Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-            directionalLight.position.set(1, 1, 1).normalize();
-            scene.add(directionalLight);
-            
-            // Controls
+            elements.container.appendChild(renderer.domElement);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            dirLight.position.set(1, 1, 1).normalize();
+            scene.add(dirLight);
             controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-
-            // Stats.js
             stats = new Stats();
-            statsJsPanel.appendChild(stats.dom);
-
-            // Helpers
-            gridHelper = new THREE.GridHelper(10000, 10000);
+            elements.statsJsPanel.appendChild(stats.dom);
+            gridHelper = new THREE.GridHelper(10000, 100, 0x888888, 0x444444);
             scene.add(gridHelper);
-            axesHelper = new THREE.AxesHelper(1000);
+            axesHelper = new THREE.AxesHelper(5000);
             scene.add(axesHelper);
-            
-            // Event Listeners
-            window.addEventListener('resize', onWindowResize);
-            fileInput.addEventListener('change', handleFileSelect);
-            dropzone.addEventListener('dragover', handleDragOver);
-            dropzone.addEventListener('dragleave', handleDragLeave);
-            dropzone.addEventListener('drop', handleFileDrop);
-            selectFileBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
-            showEdgesCheckbox.addEventListener('change', toggleEdges);
-            showAxesCheckbox.addEventListener('change', toggleAxesHelper);
-            showGridCheckbox.addEventListener('change', toggleGridHelper);
-            scaleSlider.addEventListener('input', handleScaleChange);
-            resetScaleBtn.addEventListener('click', resetScale);
-            deleteModelBtn.addEventListener('click', cleanScene);
-            teleportBtn.addEventListener('click', handleTeleport);
-            hideUiBtn.addEventListener('click', () => toggleUi(false));
-            showUiBtn.addEventListener('click', () => toggleUi(true));
-
-            // Theme change listener
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                const newColorScheme = e.matches ? "dark" : "light";
-                const newBgColor = getComputedStyle(document.body).getPropertyValue(`--bg-color-${newColorScheme}`);
-                scene.background = new THREE.Color(newBgColor);
-            });
+            addEventListeners();
+            switchUiMode(true); // 初期状態はスタート画面
         }
         
+        function addEventListeners() {
+            window.addEventListener('resize', onWindowResize);
+            elements.siteTitle.addEventListener('click', () => switchUiMode(true));
+            elements.fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+            elements.startupDropzone.addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); });
+            elements.startupDropzone.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('dragover'));
+            elements.startupDropzone.addEventListener('drop', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]); });
+            elements.startupDropzone.addEventListener('click', () => elements.fileInput.click());
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', handleTabClick));
+            elements.helpBtn.addEventListener('click', () => elements.helpModal.style.display = 'flex');
+            elements.closeHelpBtn.addEventListener('click', () => elements.helpModal.style.display = 'none');
+            elements.helpModal.addEventListener('click', (e) => { if(e.target === elements.helpModal) elements.helpModal.style.display = 'none'; });
+            elements.showEdges.addEventListener('change', toggleEdges);
+            elements.showAxes.addEventListener('change', () => { axesHelper.visible = elements.showAxes.checked; });
+            elements.showGrid.addEventListener('change', () => { gridHelper.visible = elements.showGrid.checked; });
+            elements.showStats.addEventListener('change', () => { elements.statsJsPanel.style.display = elements.showStats.checked ? 'block' : 'none'; });
+            elements.modelScale.addEventListener('input', handleScaleChange);
+            elements.resetScale.addEventListener('click', resetScale);
+            elements.resetZoomBtn.addEventListener('click', resetCamera);
+        }
+
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            stats.update();
-            const camPos = camera.position;
-            coordsOutput.textContent = `カメラ座標: X:${camPos.x.toFixed(2)} Y:${camPos.y.toFixed(2)} Z:${camPos.z.toFixed(2)}`;
-            renderer.render(scene, camera);
-        }
-
-        // --- File Handling ---
-        function handleFileSelect(event) { loadFile(event.target.files[0]); }
-        function handleDragOver(event) { event.preventDefault(); dropzone.classList.add('dragover'); }
-        function handleDragLeave(event) { event.preventDefault(); dropzone.classList.remove('dragover'); }
-        function handleFileDrop(event) {
-            event.preventDefault();
-            dropzone.classList.remove('dragover');
-            if (event.dataTransfer.files.length > 0) { loadFile(event.dataTransfer.files[0]); }
-        }
+        function animate() { requestAnimationFrame(animate); controls.update(); stats.update(); renderer.render(scene, camera); }
         
         async function loadFile(file) {
             if (!file) return;
-            cleanScene();
+            switchUiMode(false);
+            showLoading(true);
+            await cleanScene();
             fileInfo = { name: file.name, size: file.size };
-            statsOutput.innerHTML = '<p>読み込み中...</p>';
+            fileList = [file.name];
             const extension = file.name.split('.').pop().toLowerCase();
-            if (extension === 'zip') { await handleZipFile(file); } 
-            else { const url = URL.createObjectURL(file); loadModel(url, extension); }
+            if (extension === 'zip') await handleZipFile(file);
+            else loadModel(URL.createObjectURL(file), extension);
         }
 
         async function handleZipFile(file) {
-            const jszip = new JSZip();
-            const zip = await jszip.loadAsync(file);
-            const objectURLs = {};
-            const filesToLoad = [];
-            for (const filename in zip.files) {
-                if (!zip.files[filename].dir) { filesToLoad.push({ filename, promise: zip.files[filename].async('blob') }); }
-            }
-            const blobs = await Promise.all(filesToLoad.map(f => f.promise));
-            filesToLoad.forEach((f, i) => { objectURLs[f.filename] = URL.createObjectURL(blobs[i]); });
-            const manager = new THREE.LoadingManager();
-            manager.setURLModifier((url) => {
-                const found = Object.keys(objectURLs).find(key => key.endsWith(url.split('/').pop()));
-                return objectURLs[found] || url;
-            });
-            const modelFile = Object.keys(objectURLs).find(f => /\.(gltf|glb|obj|fbx|stl)$/i.test(f));
-            if (modelFile) { loadModel(objectURLs[modelFile], modelFile.split('.').pop().toLowerCase(), manager); } 
-            else { statsOutput.innerHTML = '<p>ZIP内に対応モデルが見つかりません。</p>'; }
+            const zip = await new JSZip().loadAsync(file);
+            const objectURLs = {}; fileList = [];
+            for (const filename in zip.files) if (!zip.files[filename].dir) fileList.push(filename);
+            const modelFile = fileList.find(f => /\.(gltf|glb|obj|fbx|stl)$/i.test(f));
+            if (!modelFile) { showLoading(false); alert('ZIP内に対応モデルが見つかりません。'); return; }
+            await Promise.all(fileList.map(async filename => {
+                const blob = await zip.files[filename].async('blob');
+                objectURLs[filename] = URL.createObjectURL(blob);
+            }));
+            const manager = new THREE.LoadingManager(() => showLoading(false));
+            manager.setURLModifier((url) => objectURLs[Object.keys(objectURLs).find(key => key.endsWith(url.split('/').pop()))] || url);
+            loadModel(objectURLs[modelFile], modelFile.split('.').pop().toLowerCase(), manager);
         }
 
-        function loadModel(url, extension, manager = new THREE.LoadingManager()) {
+        function loadModel(url, extension, manager = new THREE.LoadingManager(() => showLoading(false))) {
             let loader;
             switch (extension) {
                 case 'glb': case 'gltf': loader = new GLTFLoader(manager); break;
                 case 'obj': loader = new OBJLoader(manager); break;
                 case 'fbx': loader = new FBXLoader(manager); break;
                 case 'stl': loader = new STLLoader(manager); break;
-                default: statsOutput.innerHTML = `<p>非対応の形式です: .${extension}</p>`; return;
+                default: showLoading(false); alert(`非対応の形式です: .${extension}`); return;
             }
             loader.load(url, (loadedObject) => {
                 let actualModel;
-                if (extension === 'gltf' || extension === 'glb') {
-                    fullGltfData = loadedObject;
-                    actualModel = loadedObject.scene;
-                } else if (extension === 'stl') {
-                    actualModel = new THREE.Mesh(loadedObject, new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0x111111, shininess: 200 }));
-                } else {
-                    actualModel = loadedObject;
-                }
+                if (extension === 'gltf' || extension === 'glb') { fullGltfData = loadedObject; actualModel = loadedObject.scene; }
+                else if (extension === 'stl') actualModel = new THREE.Mesh(loadedObject, new THREE.MeshPhongMaterial({ color: 0xaaaaaa }));
+                else actualModel = loadedObject;
                 modelWrapper = new THREE.Group();
                 scene.add(modelWrapper);
                 fitAndCenterObject(actualModel, modelWrapper);
-                updateStats();
-                if (showEdgesCheckbox.checked) { createEdges(actualModel); }
-                deleteModelBtn.style.display = 'inline-flex';
-            }, 
-            (xhr) => { if (xhr.lengthComputable) statsOutput.innerHTML = `<p>読み込み中: ${(xhr.loaded / xhr.total * 100).toFixed(0)}%</p>`; },
-            (error) => { console.error(error); statsOutput.innerHTML = '<p>モデルの読み込みに失敗しました。</p>'; }
-            );
+                populateAllTabs();
+            }, undefined, (error) => { console.error(error); showLoading(false); alert('モデルの読み込みに失敗しました。'); });
         }
         
-        function cleanScene() {
-            deleteModelBtn.style.display = 'none';
+        async function cleanScene() {
+            if (selectedObject) { selectedObject.material = originalMaterial; selectedObject = null; originalMaterial = null; }
             if (modelWrapper) {
                 scene.remove(modelWrapper);
-                modelWrapper.traverse(object => {
-                    if (object.isMesh) {
-                        if (object.geometry) object.geometry.dispose();
-                        if (Array.isArray(object.material)) {
-                            object.material.forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
-                        } else if (object.material) {
-                            if (object.material.map) object.material.map.dispose();
-                            object.material.dispose();
-                        }
-                    }
-                });
+                modelWrapper.traverse(o => { if (o.isMesh) { o.geometry.dispose(); if (Array.isArray(o.material)) o.material.forEach(m => m.dispose()); else if (o.material) o.material.dispose(); } });
                 modelWrapper = null;
             }
-            controls.minDistance = 0;
-            controls.maxDistance = Infinity;
-            initialModelSize = 0;
-            initialCameraDistance = 0;
-            fullGltfData = null;
-            showEdgesCheckbox.checked = false;
-            resetScale();
-            statsOutput.innerHTML = '<p id="info-text">モデルを読み込んでください</p>';
+            controls.minDistance = 0; controls.maxDistance = Infinity;
+            initialModelSize = 0; initialCameraDistance = 0; fullGltfData = null; fileList = [];
+            elements.showEdges.checked = false; resetScale();
+            ['files', 'materials', 'meshes'].forEach(id => document.getElementById(`${id}-tab`).innerHTML = '');
         }
 
         function fitAndCenterObject(object, wrapper) {
             wrapper.add(object);
             const box = new THREE.Box3().setFromObject(object);
-            const center = box.getCenter(new THREE.Vector3());
-            object.position.x -= center.x;
             object.position.y -= box.min.y;
-            object.position.z -= center.z;
+            const centeredBox = new THREE.Box3().setFromObject(wrapper);
+            const center = centeredBox.getCenter(new THREE.Vector3());
+            wrapper.position.x -= center.x; wrapper.position.z -= center.z;
             const finalBox = new THREE.Box3().setFromObject(wrapper);
             const size = finalBox.getSize(new THREE.Vector3());
-            const wrapperCenter = finalBox.getCenter(new THREE.Vector3());
             const maxSize = Math.max(size.x, size.y, size.z);
-            const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
-            const fitWidthDistance = fitHeightDistance / camera.aspect;
-            const distance = 1.5 * Math.max(fitHeightDistance, fitWidthDistance);
-            initialModelSize = maxSize;
-            initialCameraDistance = distance;
-            controls.target.copy(wrapperCenter);
-            camera.near = distance / 100;
-            camera.far = distance * 100;
-            camera.updateProjectionMatrix();
-            camera.position.copy(wrapperCenter);
-            camera.position.z += distance;
-            controls.minDistance = initialModelSize * 0.1;
-            controls.maxDistance = initialCameraDistance * 50;
-            controls.update();
+            const distance = maxSize / (2 * Math.tan(camera.fov * Math.PI / 360)) * 1.5;
+            initialModelSize = maxSize; initialCameraDistance = distance;
+            controls.target.copy(wrapper.position);
+            camera.near = distance / 100; camera.far = distance * 100;
+            camera.position.set(wrapper.position.x, wrapper.position.y + size.y / 2, wrapper.position.z + distance);
+            initialCameraPosition.copy(camera.position); initialControlsTarget.copy(controls.target);
+            controls.minDistance = initialModelSize * 0.1; controls.maxDistance = initialCameraDistance * 50;
+            camera.updateProjectionMatrix(); controls.update();
+        }
+        
+        function switchUiMode(showStartup) {
+            elements.startupScreen.style.display = showStartup ? 'flex' : 'none';
+            elements.mainUiContainer.style.display = showStartup ? 'none' : 'block';
+            controls.enabled = !showStartup;
+            if (showStartup) {
+                cleanScene();
+                camera.position.copy(START_CAMERA_POS);
+                controls.target.set(0, 0, 0);
+            }
+        }
+        function showLoading(show) { elements.loadingOverlay.style.display = show ? 'flex' : 'none'; }
+        
+        function handleTabClick(e) {
+            const btn = e.currentTarget;
+            const panelId = btn.dataset.panel;
+            const contentWrapper = document.getElementById(`${panelId}-panel-content`);
+            const isActive = btn.classList.contains('active');
+            
+            if (isActive && contentWrapper.classList.contains('visible')) {
+                contentWrapper.classList.remove('visible');
+                btn.classList.remove('active');
+            } else {
+                document.querySelectorAll(`.tab-btn[data-panel="${panelId}"]`).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                contentWrapper.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(btn.dataset.tab).classList.add('active');
+                
+                contentWrapper.classList.add('visible');
+            }
+        }
+        
+        function populateAllTabs() {
+            const meshes = [], materials = new Map();
+            modelWrapper.children[0].traverse(child => {
+                if (child.isMesh) {
+                    meshes.push(child);
+                    const mat = Array.isArray(child.material) ? child.material : [child.material];
+                    mat.forEach(m => { if(m && !materials.has(m.uuid)) materials.set(m.uuid, m); });
+                }
+            });
+            elements.filesTab.innerHTML = fileList.map(name => `<div class="list-item">${name}</div>`).join('') || '<p>ファイル情報なし</p>';
+            elements.materialsTab.innerHTML = [...materials.values()].map(m => `<div class="list-item">${m.name || 'Unnamed Material'}</div>`).join('') || '<p>マテリアル情報なし</p>';
+            elements.meshesTab.innerHTML = meshes.map(mesh => `
+                <div class="list-item" data-uuid="${mesh.uuid}">
+                    <span class="name">${mesh.name || 'Unnamed Mesh'}</span>
+                    <button class="visibility-toggle" data-uuid="${mesh.uuid}">${visibleIcon}</button>
+                </div>`).join('') || '<p>メッシュ情報なし</p>';
+            elements.meshesTab.querySelectorAll('.list-item').forEach(item => {
+                item.addEventListener('click', (e) => handleMeshSelect(e.currentTarget.dataset.uuid));
+                item.querySelector('.visibility-toggle').addEventListener('click', (e) => {
+                    e.stopPropagation(); handleMeshVisibility(e.currentTarget.dataset.uuid);
+                });
+            });
+            updateStats();
         }
 
-        // --- UI Functions ---
-        function updateStats() {
-            if (!modelWrapper) return;
-            const stats = { vertices: 0, triangles: 0, objects: 0, lights: 0, cameras: 0, geometries: new Set(), materials: new Set(), textures: new Set() };
-            modelWrapper.children[0].traverse((child) => {
+        function handleMeshSelect(uuid) {
+            const mesh = scene.getObjectByProperty('uuid', uuid);
+            if (!mesh) return;
+            const listItem = elements.meshesTab.querySelector(`.list-item[data-uuid="${uuid}"]`);
+            if (selectedObject === mesh) {
+                mesh.material = originalMaterial;
+                selectedObject = null; originalMaterial = null;
+                listItem.classList.remove('selected');
+                updateStats();
+            } else {
+                if (selectedObject) {
+                    selectedObject.material = originalMaterial;
+                    elements.meshesTab.querySelector(`.list-item.selected`)?.classList.remove('selected');
+                }
+                selectedObject = mesh;
+                originalMaterial = mesh.material;
+                mesh.material = highlightMaterial;
+                listItem.classList.add('selected');
+                updateStats(mesh);
+            }
+        }
+        function handleMeshVisibility(uuid) {
+            const mesh = scene.getObjectByProperty('uuid', uuid);
+            if (!mesh) return;
+            mesh.visible = !mesh.visible;
+            const button = elements.meshesTab.querySelector(`.visibility-toggle[data-uuid="${uuid}"]`);
+            button.innerHTML = mesh.visible ? visibleIcon : hiddenIcon;
+        }
+
+        function updateStats(targetObject) {
+            const obj = targetObject || modelWrapper;
+            if (!obj) { elements.statsOutput.innerHTML = '<h3>モデル情報</h3><div class="content-section"><p>モデルを読み込んでください</p></div>'; return; }
+            const stats = { vertices: 0, triangles: 0, objects: 0 };
+            obj.traverse(child => {
                 if (child.isMesh) {
                     stats.objects++;
                     if (child.geometry) {
-                        stats.geometries.add(child.geometry.uuid);
                         stats.vertices += child.geometry.attributes.position.count;
                         stats.triangles += (child.geometry.index) ? child.geometry.index.count / 3 : child.geometry.attributes.position.count / 3;
                     }
-                    if (Array.isArray(child.material)) { child.material.forEach(m => collectMaterialInfo(m, stats)); } 
-                    else if (child.material) { collectMaterialInfo(child.material, stats); }
-                } else if (child.isLight) { stats.lights++; } 
-                  else if (child.isCamera) { stats.cameras++; }
+                }
             });
-            const animationsCount = fullGltfData?.animations?.length || 0;
-            const size = new THREE.Box3().setFromObject(modelWrapper).getSize(new THREE.Vector3());
-            statsOutput.innerHTML = `
-                <h3>モデル情報</h3>
-                <p><strong>ファイル名:</strong> ${fileInfo.name}</p>
-                <p><strong>ファイルサイズ:</strong> ${(fileInfo.size / 1024 / 1024).toFixed(2)} MB</p>
+            const size = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
+            const header = targetObject ? `<h3>${targetObject.name || '選択オブジェクト'}</h3>` : '<h3>モデル全体</h3>';
+            elements.statsOutput.innerHTML = `${header}<div class="content-section">
+                ${!targetObject ? `<p><strong>ファイル名:</strong> ${fileInfo.name}</p>` : ''}
                 <p><strong>寸法 (W/H/D):</strong> ${size.x.toFixed(2)} / ${size.y.toFixed(2)} / ${size.z.toFixed(2)}</p>
-                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 5px 0;">
+                </div><hr/><div class="content-section">
                 <p><strong>頂点数:</strong> ${stats.vertices.toLocaleString()}</p>
                 <p><strong>三角形数:</strong> ${Math.floor(stats.triangles).toLocaleString()}</p>
-                <p><strong>オブジェクト数:</strong> ${stats.objects.toLocaleString()}</p>
-                <p><strong>ジオメトリ数:</strong> ${stats.geometries.size.toLocaleString()}</p>
-                <p><strong>マテリアル数:</strong> ${stats.materials.size.toLocaleString()}</p>
-                <p><strong>テクスチャ数:</strong> ${stats.textures.size.toLocaleString()}</p>
-                <p><strong>アニメーション数:</strong> ${animationsCount}</p>
-                <p><strong>ライト数:</strong> ${stats.lights}</p>
-                <p><strong>カメラ数:</strong> ${stats.cameras}</p>
+                <p><strong>オブジェクト数:</strong> ${stats.objects.toLocaleString()}</p></div>
             `;
         }
         
-        function collectMaterialInfo(material, stats) {
-            stats.materials.add(material.uuid);
-            for (const key in material) { if (material[key] instanceof THREE.Texture) { stats.textures.add(material[key].uuid); } }
-        }
-
         function handleScaleChange(e) {
             if (modelWrapper) {
                 const scale = parseFloat(e.target.value);
                 modelWrapper.scale.set(scale, scale, scale);
-                if (initialModelSize > 0 && initialCameraDistance > 0) {
-                    controls.minDistance = initialModelSize * 0.1 * scale;
-                    controls.maxDistance = initialCameraDistance * 50 * scale;
-                }
-                updateStats();
+                if (initialModelSize > 0) { controls.minDistance = initialModelSize * 0.1 * scale; controls.maxDistance = initialCameraDistance * 50 * scale; }
+                updateStats(selectedObject);
             }
         }
-        
         function resetScale() {
             if (modelWrapper) {
                 modelWrapper.scale.set(1, 1, 1);
-                if (initialModelSize > 0 && initialCameraDistance > 0) {
-                    controls.minDistance = initialModelSize * 0.1;
-                    controls.maxDistance = initialCameraDistance * 50;
-                }
-                updateStats();
+                if (initialModelSize > 0) { controls.minDistance = initialModelSize * 0.1; controls.maxDistance = initialCameraDistance * 50; }
+                updateStats(selectedObject);
             }
-            scaleSlider.value = 1;
+            elements.modelScale.value = 1;
         }
-
-        function toggleEdges() {
-            if (!modelWrapper) return;
-            const actualModel = modelWrapper.children[0];
-            if (showEdgesCheckbox.checked) { createEdges(actualModel); } 
-            else { removeEdges(actualModel); }
-        }
-        
-        function toggleAxesHelper() { axesHelper.visible = showAxesCheckbox.checked; }
-        function toggleGridHelper() { gridHelper.visible = showGridCheckbox.checked; }
-        
-        function toggleUi(show) {
-            uiPanel.style.display = show ? 'flex' : 'none';
-            statsJsPanel.style.display = show ? 'block' : 'none';
-            showUiBtn.style.display = show ? 'none' : 'block';
-        }
-
-        function handleTeleport() {
-            const x = parseFloat(teleportXInput.value);
-            const y = parseFloat(teleportYInput.value);
-            const z = parseFloat(teleportZInput.value);
-            if (!isNaN(x) && !isNaN(y) && !isNaN(z)) { camera.position.set(x, y, z); controls.update(); } 
-            else { alert('有効な数値をすべての座標に入力してください。'); }
-        }
+        function resetCamera() { if(!modelWrapper) return; camera.position.copy(initialCameraPosition); controls.target.copy(initialControlsTarget); controls.update(); }
+        function toggleEdges() { if (!modelWrapper) return; elements.showEdges.checked ? createEdges(modelWrapper.children[0]) : removeEdges(modelWrapper.children[0]); }
 
         function createEdges(object) {
             object.traverse((child) => {
                 if (child.isMesh && !child.children.some(c => c.userData.isEdge)) {
-                    const edges = new THREE.EdgesGeometry(child.geometry, 15);
-                    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x03a9f4, transparent: true, opacity: 0.8 }));
-                    line.userData.isEdge = true;
-                    child.add(line);
+                    const edges = new THREE.EdgesGeometry(child.geometry, 1);
+                    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x03a9f4 }));
+                    line.userData.isEdge = true; child.add(line);
                 }
             });
         }
-
         function removeEdges(object) {
             const edgesToRemove = [];
-            object.traverse(child => {
-                child.children.forEach(grandchild => { if (grandchild.userData.isEdge) edgesToRemove.push(grandchild); });
-            });
-            edgesToRemove.forEach(edge => {
-                edge.parent.remove(edge);
-                edge.geometry.dispose();
-                edge.material.dispose();
-            });
+            object.traverse(child => { child.children.forEach(gc => { if (gc.userData.isEdge) edgesToRemove.push(gc); }); });
+            edgesToRemove.forEach(edge => { edge.parent.remove(edge); edge.geometry.dispose(); edge.material.dispose(); });
         }
     </script>
 </body>
